@@ -1,0 +1,37 @@
+{
+  "name": "yinfuyuan/php-enum",
+  "type": "library",
+  "description": "PHP Enum",
+  "keywords": ["enum"],
+  "homepage": "https://github.com/yinfuyuan/php-enum",
+  "support": {
+    "issues": "https://github.com/yinfuyuan/php-enum/issues",
+    "source": "https://github.com/yinfuyuan/php-enum"
+  },
+  "license": "GPL-3.0",
+  "authors": [
+    {
+      "name": "yinfuyuan",
+      "email": "yinfuyuan@gmail.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "PhpEnum\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "PhpEnum\\Tests\\": "tests/"
+    }
+  },
+  "require": {
+    "php": ">=5.*",
+    "ext-json": "*"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^7",
+    "squizlabs/php_codesniffer": "1.*",
+    "vimeo/psalm": "^3.8"
+  }
+}
