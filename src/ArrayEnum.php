@@ -100,6 +100,9 @@ abstract class ArrayEnum extends Enum
         $constants = $reflectionClass->getConstants();
 
         foreach ($constants as $key => $value) {
+            if($key == 'LENGTH') {
+                continue;
+            }
             if(empty($prefix) || strstr($key, strtoupper($prefix))) {
                 $values[reset($value)] = end($value);
             }

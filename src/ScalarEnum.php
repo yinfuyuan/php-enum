@@ -3,19 +3,19 @@
 namespace PhpEnum;
 
 /**
- * Class StringEnum
+ * Class ScalarEnum
  *
  * @author yinfuyuan <yinfuyuan@gmail.com>
  * @link https://github.com/yinfuyuan/php-enum
  * @license https://opensource.org/licenses/GPL-3.0
  */
-abstract class StringEnum extends Enum
+abstract class ScalarEnum extends Enum
 {
 
     /**
-     * Create a new string enum instance.
+     * Create a new scalar enum instance.
      *
-     * @param array $attribute
+     * @param mixed $attribute
      * @return void
      *
      * @throws \Exception
