@@ -17,7 +17,7 @@ abstract class ArrayEnum extends Enum
      *
      * @var integer
      */
-    protected const LENGTH = 2;
+    protected static $ENUM_LENGTH = 2;
 
     /**
      * The enum key.
@@ -70,6 +70,28 @@ abstract class ArrayEnum extends Enum
     }
 
     /**
+     * Compare the keys to be equal.
+     *
+     * @param mixed $key
+     * @return bool
+     */
+    public function keyEquals($key)
+    {
+        return $this->getKey() == $key;
+    }
+
+    /**
+     * Compare the values to be equal.
+     *
+     * @param mixed $value
+     * @return bool
+     */
+    public function valueEquals($value)
+    {
+        return $this->getValue() == $value;
+    }
+
+    /**
      * Get the array enum all keys.
      *
      * @param string $prefix
@@ -100,15 +122,54 @@ abstract class ArrayEnum extends Enum
         $constants = $reflectionClass->getConstants();
 
         foreach ($constants as $key => $value) {
-            if($key == 'LENGTH') {
-                continue;
-            }
             if(empty($prefix) || strstr($key, strtoupper($prefix))) {
                 $values[reset($value)] = end($value);
             }
         }
 
         return $values;
+
+    }
+
+    /**
+     * Determine if the key exists.
+     *
+     * @param mixed $key
+     * @param string $prefix
+     * @return bool
+     */
+    public static function keyExist($key, $prefix = '')
+    {
+
+        $values = self::getValues($prefix);
+
+        if(empty($values[$key])) {
+            return false;
+        }
+
+        return true;
+
+    }
+
+    /**
+     * Determine if the value exists.
+     *
+     * @param mixed $value
+     * @param string $prefix
+     * @return bool
+     */
+    public static function valueExist($value, $prefix = '')
+    {
+
+        $values = self::getValues($prefix);
+
+        $key = array_search($value, $values);
+
+        if(false === $key) {
+            return false;
+        }
+
+        return true;
 
     }
 
@@ -151,6 +212,21 @@ abstract class ArrayEnum extends Enum
         }
 
         return $values[$key];
+
+    }
+
+    /**
+     * Get enum size.
+     *
+     * @param string $prefix
+     * @return int
+     */
+    public static function getSize($prefix = '')
+    {
+
+        $values = self::getValues($prefix);
+
+        return count($values);
 
     }
 

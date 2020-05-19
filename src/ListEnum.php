@@ -44,7 +44,7 @@ abstract class ListEnum extends Enum
      *
      * @var integer
      */
-    protected const LENGTH = 1;
+    protected static $ENUM_LENGTH = 1;
 
     /**
      * The attribute key index.

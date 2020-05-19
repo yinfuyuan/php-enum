@@ -17,7 +17,7 @@ abstract class Enum
      *
      * @var integer
      */
-    protected const LENGTH = 0;
+    protected static $ENUM_LENGTH = 0;
 
     /**
      * Create a new enum instance.
@@ -33,7 +33,7 @@ abstract class Enum
         if(!is_array($attributes)) {
             throw new \InvalidArgumentException('Enum attribute only accepts array.');
         }
-        if($this->getLength() <= self::LENGTH) {
+        if($this->getLength() <= self::$ENUM_LENGTH) {
             throw new \LengthException('Enum attribute length must be greater than zero');
         }
         if($this->getLength() != count($attributes)) {
@@ -60,7 +60,7 @@ abstract class Enum
      */
     public function getLength()
     {
-        return static::LENGTH;
+        return static::$ENUM_LENGTH;
     }
 
 }
