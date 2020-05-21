@@ -7,7 +7,6 @@ namespace PhpEnum;
  *
  * @author yinfuyuan <yinfuyuan@gmail.com>
  * @link https://github.com/yinfuyuan/php-enum
- * @license https://opensource.org/licenses/GPL-3.0
  *
  * @property mixed A
  * @property mixed B
@@ -44,21 +43,7 @@ abstract class ListEnum extends Enum
      *
      * @var integer
      */
-    protected static $ENUM_LENGTH = 1;
-
-    /**
-     * The attribute key index.
-     *
-     * @var integer $index
-     */
-    private $index;
-
-    /**
-     * The attribute.
-     *
-     * @var array $attribute
-     */
-    private $attribute;
+    protected static $ENUM_LENGTH = 0;
 
     /**
      * Create a new list enum instance.
@@ -72,16 +57,23 @@ abstract class ListEnum extends Enum
     public function __construct($attribute)
     {
         parent::__construct($attribute);
-        $this->attribute = array_values($attribute);
-        $this->setIndex(0);
+        if(!is_array($attribute)) {
+            throw new \InvalidArgumentException('Enum attribute only accepts array.');
+        }
+        if(empty(self::getLength())) {
+            throw new \LengthException('Enum attribute length must be greater than zero');
+        }
+        if(self::getLength() != count($attribute)) {
+            throw new \LengthException('Enum attribute length does not adhere to a defined valid length');
+        }
         $reflectionClass = new \ReflectionClass(static::class);
         $properties = $reflectionClass->getProperties(\ReflectionProperty::IS_PRIVATE | \ReflectionProperty::IS_PROTECTED);
-        $value = reset($this->attribute);
+        $value = reset($attribute);
         foreach ($properties as $property) {
-            if(strstr($property->getName(), 'enum_') && null != $value) {
+            if(!$property->isStatic() && strstr($property->getName(), 'enum_') && null != $value) {
                 $property->setAccessible(true);
                 $property->setValue($this, $value);
-                $value = next($this->attribute);
+                $value = next($attribute);
             }
         }
     }
@@ -91,64 +83,57 @@ abstract class ListEnum extends Enum
      *
      * @param string $name
      * @return mixed|null
+     *
+     * @throws \InvalidArgumentException
+     * @throws \OutOfRangeException
      */
     public function __get($name)
     {
         $letters = str_split('ABCDEFGHIJKLMNOPQRSTTUVWXYZ');
         if(in_array($name, $letters)) {
-            return $this->getValue(array_search($name, $letters));
+            return $this->get(array_search($name, $letters));
         }
         $index = [];
         if(!preg_match('/\d+/',$name,$index)){
-            return null;
+            throw new \InvalidArgumentException('Undefined enum property');
         }
-        return $this->getValue(reset($index));
+        return $this->get(intval(reset($index)));
     }
 
     /**
-     * Set index value.
+     * Get the enum using the index.
      *
-     * @param int $index
-     * @return $this
+     * @param integer $index
+     * @return mixed
+     *
+     * @throws \InvalidArgumentException
+     * @throws \OutOfRangeException
      */
-    public function setIndex($index)
+    public function get($index)
     {
-        if($index >= $this->getLength()) {
-            throw new \InvalidArgumentException('Index value does not adhere to a defined valid length');
+
+        if(!is_int($index)) {
+            throw new \InvalidArgumentException('Enum index only accepts integer');
         }
-        $this->index = $index;
-        return $this;
+
+        if($index < 0 || $index >= self::getLength()) {
+            throw new \OutOfRangeException("Enum index out of defined range");
+        }
+
+        $value = array_values(parent::getValue());
+
+        return $value[$index];
+
     }
 
     /**
-     * Get index value.
+     * Get enum attribute length.
      *
      * @return int
      */
-    public function getIndex()
+    public static function getLength()
     {
-        return $this->index;
-    }
-
-    /**
-     * Get current attribute value.
-     *
-     * @return mixed
-     */
-    public function getCurrent()
-    {
-        return $this->attribute[$this->index];
-    }
-
-    /**
-     * Get attribute value by index.
-     *
-     * @param int $index
-     * @return mixed
-     */
-    public function getValue($index)
-    {
-        return $this->setIndex($index)->getCurrent();
+        return static::$ENUM_LENGTH;
     }
 
 }

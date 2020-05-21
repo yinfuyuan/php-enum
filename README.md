@@ -23,13 +23,13 @@ Array enum provides the definition and use of key-value enums in the form of arr
 If you use it as a unified error code return, it should look something like this
 
     /**
-     * @method static ErrorCodeEnum OK
+     * @method static self OK
      *
-     * @method static CodeEnum UNKNOWN_ERROR
+     * @method static self UNKNOWN_ERROR
      *
-     * @method static ErrorCodeEnum ERROR_DATA_VALIDATION
-     * @method static ErrorCodeEnum ERROR_USER_INVALID
-     * @method static ErrorCodeEnum ERROR_CONFIG_ERROR
+     * @method static self ERROR_DATA_VALIDATION
+     * @method static self ERROR_USER_INVALID
+     * @method static self ERROR_CONFIG_ERROR
      */
     class ErrorCodeEnum extends \PhpEnum\ArrayEnum
     {
@@ -88,18 +88,18 @@ You can do this when you encounter an exception that returns the expected result
 If you use it as enumeration, it should look something like this
 
     /**
-     * @method static ArticleEnum TYPE_ARTICLE
-     * @method static ArticleEnum TYPE_STORY
-     * @method static ArticleEnum TYPE_NEWS
+     * @method static self TYPE_ARTICLE
+     * @method static self TYPE_STORY
+     * @method static self TYPE_NEWS
      *
-     * @method static ArticleEnum SHARE_PRIVATE
-     * @method static ArticleEnum SHARE_PROTECTED
-     * @method static ArticleEnum SHARE_PUBLIC
+     * @method static self SHARE_PRIVATE
+     * @method static self SHARE_PROTECTED
+     * @method static self SHARE_PUBLIC
      *
-     * @method static ArticleEnum STATUS_NORMAL
-     * @method static ArticleEnum STATUE_AUDIT
-     * @method static ArticleEnum STATUE_INACTIVE
-     * @method static ArticleEnum STATUS_INVALID
+     * @method static self STATUS_NORMAL
+     * @method static self STATUS_AUDIT
+     * @method static self STATUS_INACTIVE
+     * @method static self STATUS_INVALID
      */
     class ArticleEnum extends \PhpEnum\ArrayEnum
     {

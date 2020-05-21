@@ -7,9 +7,8 @@ namespace PhpEnum;
  *
  * @author yinfuyuan <yinfuyuan@gmail.com>
  * @link https://github.com/yinfuyuan/php-enum
- * @license https://opensource.org/licenses/GPL-3.0
  */
-abstract class ArrayEnum extends Enum
+abstract class ArrayEnum extends ListEnum
 {
 
     /**
@@ -24,29 +23,33 @@ abstract class ArrayEnum extends Enum
      *
      * @var mixed $key
      */
-    private $key;
+    protected $enum_key;
 
     /**
      * The enum value.
      *
      * @var mixed $value
      */
-    private $value;
+    protected $enum_value;
 
     /**
-     * Create a new array enum instance.
+     * Get the enum key.
      *
-     * @param array $attributes
-     * @return void
-     *
-     * @throws \InvalidArgumentException
-     * @throws \LengthException
+     * @return mixed
      */
-    public function __construct($attributes)
+    public function getEnumKey()
     {
-        parent::__construct($attributes);
-        $this->key = reset($attributes);
-        $this->value = end($attributes);
+        return parent::getKey();
+    }
+
+    /**
+     * Get the enum value.
+     *
+     * @return mixed
+     */
+    public function getEnumValue()
+    {
+        return parent::getValue();
     }
 
     /**
@@ -56,7 +59,7 @@ abstract class ArrayEnum extends Enum
      */
     public function getKey()
     {
-        return $this->key;
+        return $this->enum_key;
     }
 
     /**
@@ -66,44 +69,7 @@ abstract class ArrayEnum extends Enum
      */
     public function getValue()
     {
-        return $this->value;
-    }
-
-    /**
-     * Compare the keys to be equal.
-     *
-     * @param mixed $key
-     * @return bool
-     */
-    public function keyEquals($key)
-    {
-        return $this->getKey() == $key;
-    }
-
-    /**
-     * Compare the values to be equal.
-     *
-     * @param mixed $value
-     * @return bool
-     */
-    public function valueEquals($value)
-    {
-        return $this->getValue() == $value;
-    }
-
-    /**
-     * Get the array enum all keys.
-     *
-     * @param string $prefix
-     * @return array
-     */
-    public static function getKeys($prefix = '')
-    {
-
-        $values = self::getValues($prefix);
-
-        return array_keys($values);
-
+        return $this->enum_value;
     }
 
     /**
@@ -132,102 +98,13 @@ abstract class ArrayEnum extends Enum
     }
 
     /**
-     * Determine if the key exists.
+     * Get enum attribute length.
      *
-     * @param mixed $key
-     * @param string $prefix
-     * @return bool
-     */
-    public static function keyExist($key, $prefix = '')
-    {
-
-        $values = self::getValues($prefix);
-
-        if(empty($values[$key])) {
-            return false;
-        }
-
-        return true;
-
-    }
-
-    /**
-     * Determine if the value exists.
-     *
-     * @param mixed $value
-     * @param string $prefix
-     * @return bool
-     */
-    public static function valueExist($value, $prefix = '')
-    {
-
-        $values = self::getValues($prefix);
-
-        $key = array_search($value, $values);
-
-        if(false === $key) {
-            return false;
-        }
-
-        return true;
-
-    }
-
-    /**
-     * Search the key based on the value.
-     *
-     * @param mixed $value
-     * @param string $prefix
-     * @return mixed|null
-     */
-    public static function searchKey($value, $prefix = '')
-    {
-
-        $values = self::getValues($prefix);
-
-        $key = array_search($value, $values);
-
-        if(false === $key) {
-            return null;
-        }
-
-        return $key;
-
-    }
-
-    /**
-     * Search the value based on the key.
-     *
-     * @param mixed $key
-     * @param string $prefix
-     * @return mixed|null
-     */
-    public static function searchValue($key, $prefix = '')
-    {
-
-        $values = self::getValues($prefix);
-
-        if(empty($values[$key])) {
-            return null;
-        }
-
-        return $values[$key];
-
-    }
-
-    /**
-     * Get enum size.
-     *
-     * @param string $prefix
      * @return int
      */
-    public static function getSize($prefix = '')
+    public static function getLength()
     {
-
-        $values = self::getValues($prefix);
-
-        return count($values);
-
+        return self::$ENUM_LENGTH;
     }
 
 }
