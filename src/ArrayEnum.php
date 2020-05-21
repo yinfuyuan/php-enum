@@ -97,14 +97,4 @@ abstract class ArrayEnum extends ListEnum
 
     }
 
-    /**
-     * Get enum attribute length.
-     *
-     * @return int
-     */
-    public static function getLength()
-    {
-        return self::$ENUM_LENGTH;
-    }
-
 }
