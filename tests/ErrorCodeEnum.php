@@ -11,10 +11,8 @@ namespace PhpEnum\Tests;
  * @method static self ERROR_USER_INVALID
  * @method static self ERROR_CONFIG_ERROR
  */
-class ErrorCodeEnum extends \PhpEnum\ListEnum
+class ErrorCodeEnum extends \PhpEnum\ArrayEnum
 {
-
-    protected static $ENUM_LENGTH = 2;
 
     const OK = ['0', 'ok'];
 

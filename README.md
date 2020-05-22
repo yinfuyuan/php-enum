@@ -83,18 +83,18 @@ List enumeration inherits from the underlying enumeration. Enumeration propertie
 The following takes city enumeration as an example to introduce the use of list enumeration. In the following definition, enumeration length is 3, which respectively represents the province code, city code and city name
 
     /**
-     * @method static self CIRY_BEIJING
-     * @method static self CIRY_LIAONING
-     * @method static self CIRY_SHENYANG
-     * @method static self CIRY_DALIAN
+     * @method static self CITY_BEIJING
+     * @method static self CITY_LIAONING
+     * @method static self CITY_SHENYANG
+     * @method static self CITY_DALIAN
      */
     class CityEnum extends \PhpEnum\ListEnum
     {
         protected static $ENUM_LENGTH = 3;
-        const CIRY_BEIJING = ['110000', '110000', 'BEIJINGSHI'];
-        const CIRY_LIAONING = ['22000', '22000', 'LIAONINGSHENG'];
-        const CIRY_SHENYANG = ['22000', '210100', 'SHENYANGSHI'];
-        const CIRY_DALIAN = ['22000', '210200', 'DALIANSHI'];
+        const CITY_BEIJING = ['110000', '110000', 'BEIJINGSHI'];
+        const CITY_LIAONING = ['22000', '22000', 'LIAONINGSHENG'];
+        const CITY_SHENYANG = ['22000', '210100', 'SHENYANGSHI'];
+        const CITY_DALIAN = ['22000', '210200', 'DALIANSHI'];
         private $enum_pcode;
         private $enum_code;
         private $enum_name;
@@ -114,12 +114,13 @@ The following takes city enumeration as an example to introduce the use of list 
     
 The enumeration example of shenyang city is obtained in the following way
 
-    CityEnum::CIRY_SHENYANG();
+    CityEnum::CITY_SHENYANG();
     
 List enumerations inherit from the methods of the underlying enumeration and provide the following methods
     
 ```
 get                 : Gets the value of the specified index
+searchRelations     : Gets the value of the relationship enumeration
 getLength           : [static method] gets the enumeration property length
 ```
 
@@ -127,23 +128,23 @@ List enumerations provide two quick ways to access the list because the length o
 
 1. By accessing the enumeration of nonexistent property names containing numeric subscripts, for example:
     
-    CityEnum::CIRY_SHENYANG()->property0 // An element that represents access to an array of enumerated attributes subscript 0, and so on
+    CityEnum::CITY_SHENYANG()->property0 // An element that represents access to an array of enumerated attributes subscript 0, and so on
     
 2. If the enumeration property is no longer than 26, the list enumeration provides access to large letters instead of numeric subscripts. For example:
 
-    CityEnum::CIRY_SHENYANG()->A // An element that represents access to an array of enumerated attributes subscript 0, and so on
+    CityEnum::CITY_SHENYANG()->A // An element that represents access to an array of enumerated attributes subscript 0, and so on
     
 In addition to the above two shortcuts, it is recommended that you provide an attribute for each element, as defined by CityEnum, starting with a lowercase enum_, private or protected, and providing a getter,
 
 Do not provide setters, as this may break the enumeration structure. When you get a list enumeration instance, the attributes of each element are automatically initialized in the order defined. Note that the number of properties and the length of enumeration properties should be the same.
 
-List enumerations can be found by looking at the parent city enumeration
+List enumeration can be used to find the parent city enumeration value by the following method
 
-    // todo
+    CityEnum::CITY_SHENYANG()->searchRelations(0, 1)
     
-List enumerations can be found for all child city enumerations by the following method
+List enumeration can be used to find all the child city enumeration values by the following method
 
-    // todo
+    CityEnum::CITY_LIAONING()->searchRelations(1, 0)
     
 * ### ArrayEnum [src](https://github.com/yinfuyuan/php-enum/blob/master/src/ArrayEnum.php) [tests](https://github.com/yinfuyuan/php-enum/blob/master/tests/ArrayEnumTest.php)
 
@@ -171,7 +172,7 @@ Get an error-free enumeration instance in the following manner
 
     ErrorCodeEnum::OK();
     
-List enumerations inherit from the methods of the base and list enumerations and provide the following methods
+Array enumerations inherit from the methods of the base and list enumerations and provide the following methods
     
 ```
 getEnumKey          : Get the enumeration name

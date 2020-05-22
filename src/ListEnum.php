@@ -127,6 +127,46 @@ abstract class ListEnum extends Enum
     }
 
     /**
+     * Search relation enum values.
+     *
+     * @param int $index
+     * @param int $relation_index
+     * @param string $prefix
+     * @return array
+     *
+     * @throws \InvalidArgumentException
+     * @throws \OutOfRangeException
+     */
+    public function searchRelations($index, $relation_index, $prefix = '')
+    {
+
+        if(!is_int($relation_index)) {
+            throw new \InvalidArgumentException('Enum index only accepts integer');
+        }
+
+        if($relation_index < 0 || $relation_index >= self::getLength()) {
+            throw new \OutOfRangeException("Enum index out of defined range");
+        }
+
+        $value = $this->get($index);
+
+        $values = static::getValues($prefix);
+
+        if(empty($values)) {
+            return [];
+        }
+
+        foreach ($values as $k => $v) {
+            if(empty($v[$relation_index]) || $v[$relation_index] != $value) {
+                unset($values[$k]);
+            }
+        }
+
+        return $values;
+
+    }
+
+    /**
      * Get enum attribute length.
      *
      * @return int
