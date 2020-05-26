@@ -6,7 +6,7 @@ Reading this document assumes that you already know the basics of enumeration. I
 
 Enums can be used in every project, but they are defined and used in different ways. In PHP, most enums exist as either constants or static variables.
 
-PHP has provided us with enumeration classes through the SQL class library, but unfortunately it needs to be installed in an extended way and the methods provided are limited.
+PHP has provided us with enumeration classes through the SPL class library, but unfortunately it needs to be installed in an extended way and the methods provided are limited.
 
 As a result, developers provide many excellent enumeration libraries, but many times the enumeration values we need are not single, so this library provides support for multiple enumeration values.
 
