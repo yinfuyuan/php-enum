@@ -12,7 +12,7 @@ As a result, developers provide many excellent enumeration libraries, but many t
 
 ## Install
 
-    $ composer require yinfuyuan/php-enum
+    $ composer require phpenum/phpenum
     
 ## Document
 

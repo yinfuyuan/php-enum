@@ -16,7 +16,7 @@ PHP官方通过SPL类库为我们提供了枚举类SplEnum，但遗憾的是，�
 
 ## 安装
 
-    composer require yinfuyuan/php-enum
+    composer require phpenum/phpenum
     
 ## 文档
 
