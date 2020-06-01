@@ -63,17 +63,20 @@ abstract class ListEnum extends Enum
         if(empty(self::getLength())) {
             throw new \LengthException('Enum attribute length must be greater than zero');
         }
-        if(self::getLength() != count($attribute)) {
+        $attributeCount = count($attribute);
+        if(self::getLength() != $attributeCount) {
             throw new \LengthException('Enum attribute length does not adhere to a defined valid length');
         }
         $reflectionClass = new \ReflectionClass(static::class);
         $properties = $reflectionClass->getProperties(\ReflectionProperty::IS_PRIVATE | \ReflectionProperty::IS_PROTECTED);
-        $value = reset($attribute);
+        $value = array_shift($attribute);
+        $attributeCount--;
         foreach ($properties as $property) {
-            if(!$property->isStatic() && strstr($property->getName(), 'enum_') && null != $value) {
+            if(!$property->isStatic() && strstr($property->getName(), 'enum_') && $attributeCount >= self::$ENUM_LENGTH) {
                 $property->setAccessible(true);
                 $property->setValue($this, $value);
-                $value = next($attribute);
+                $value = array_shift($attribute);
+                $attributeCount--;
             }
         }
     }
