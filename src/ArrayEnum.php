@@ -12,89 +12,211 @@ abstract class ArrayEnum extends ListEnum
 {
 
     /**
-     * Constant representing enum attribute length.
+     * The key of this array enum constant, as declared in the array enum declaration.
      *
-     * @var integer
+     * @var mixed
      */
-    protected static $ENUM_LENGTH = 2;
+    private $key;
 
     /**
-     * The enum key.
+     * The value of this array enum constant, as declared in the array enum declaration.
      *
-     * @var mixed $key
+     * @var mixed
      */
-    protected $enum_key;
+    private $value;
 
     /**
-     * The enum value.
-     *
-     * @var mixed $value
+     * @inheritDoc
      */
-    protected $enum_value;
-
-    /**
-     * Get the enum key.
-     *
-     * @return mixed
-     */
-    public function getEnumKey()
+    protected final function ListEnum($list)
     {
-        return parent::getKey();
+        list($this->key, $this->value) = $list;
     }
 
     /**
-     * Get the enum value.
-     *
-     * @return mixed
+     * @inheritDoc
      */
-    public function getEnumValue()
+    public final static function length()
     {
-        return parent::getValue();
+        return 2;
     }
 
     /**
-     * Get the enum key.
+     * Get the array enum key.
      *
      * @return mixed
      */
-    public function getKey()
+    public final function getKey()
     {
-        return $this->enum_key;
+        return $this->key;
     }
 
     /**
-     * Get the enum value.
+     * Get the array enum value.
      *
      * @return mixed
      */
-    public function getValue()
+    public final function getValue()
     {
-        return $this->enum_value;
+        return $this->value;
     }
 
     /**
-     * Get the array enum all values.
+     * Returns true if the specified key is equal to this enum key.
      *
-     * @param string $prefix
-     * @return array
+     * When comparing with floating point numbers, you may get unexpected results.
+     * @link https://www.php.net/manual/en/language.types.float.php
+     *
+     * @param string $key the key to be compared for equality with this enum key.
+     * @param bool $strict the default value is true, and the strict mode is used for compared.
+     * @return bool true if the specified key is equal to this enum key.
      */
-    public static function getValues($prefix = '')
+    public final function keyEquals($key, $strict = true)
     {
+        return $strict ? $this->getKey() === $key : $this->getKey() == $key;
+    }
 
+    /**
+     * Returns true if the specified value is equal to this enum value.
+     *
+     * When comparing with floating point numbers, you may get unexpected results.
+     * @link https://www.php.net/manual/en/language.types.float.php
+     *
+     * @param mixed $value the value to be compared for equality with this enum value.
+     * @param bool $strict the default value is true, and the strict mode is used for compared.
+     * @return bool true if the specified value is equal to this enum value.
+     */
+    public final function valueEquals($value, $strict = true)
+    {
+        return $strict ? $this->getValue() === $value : $this->getValue() == $value;
+    }
+
+    /**
+     * Returns all the enum keys.
+     *
+     * @param string $prefix returns the part of that name is start with the specified prefix.
+     * @param bool $match_case the default value is true, match case when comparing name prefix.
+     * @return string[] all the enum keys.
+     */
+    public final static function getKeys($prefix = '', $match_case = true)
+    {
+        $values = static::getValues($prefix, $match_case);
+
+        if(empty($values)) {
+            return [];
+        }
+
+        return array_keys($values);
+    }
+
+    /**
+     * Returns all the enum values and uses the key as the key.
+     *
+     * @param string $prefix returns the part of that name is start with the specified prefix.
+     * @param bool $match_case the default value is true, match case when comparing name prefix.
+     * @return array all the enum values and uses the key as the key.
+     */
+    public static function getValues($prefix = '', $match_case = true)
+    {
         $values = [];
 
-        $reflectionClass = new \ReflectionClass(static::class);
+        $valueArray = self::values($prefix, $match_case);
 
-        $constants = $reflectionClass->getConstants();
-
-        foreach ($constants as $key => $value) {
-            if(empty($prefix) || strstr($key, strtoupper($prefix))) {
-                $values[reset($value)] = end($value);
-            }
+        foreach ($valueArray as $value) {
+            $values[reset($value)] = end($value);
         }
 
         return $values;
+    }
 
+    /**
+     * Returns all the enum instances and uses the key as the key.
+     *
+     * @param string $prefix returns the part of that name is start with the specified prefix.
+     * @param bool $match_case the default value is true, match case when comparing name prefix.
+     * @return static[] all the enum instances and uses the key as the key.
+     */
+    public final static function getEnums($prefix = '', $match_case = true)
+    {
+        $enums = [];
+
+        $enumArray = self::enums($prefix, $match_case);
+
+        foreach ($enumArray as $enum) {
+            $enums[$enum->getKey()] = $enum;
+        }
+
+        return $enums;
+    }
+
+    /**
+     * Returns true if the specified key is exists.
+     *
+     * @param mixed $key the key used to check if it exists.
+     * @param string $prefix returns the part of that name is start with the specified prefix.
+     * @param bool $match_case the default value is true, match case when comparing name prefix.
+     * @return bool true if the specified key is exists.
+     */
+    public final static function hasKey($key, $prefix = '', $match_case = true)
+    {
+        $values = static::getValues($prefix, $match_case);
+
+        return array_key_exists($key, $values);
+    }
+
+    /**
+     * Returns true if the specified value is exists.
+     *
+     * @param mixed $value the value used to check if it exists.
+     * @param string $prefix returns the part of that name is start with the specified prefix.
+     * @param bool $match_case the default value is true, match case when comparing name prefix.
+     * @return bool true if the specified value is exists.
+     */
+    public final static function hasValue($value, $prefix = '', $match_case = true)
+    {
+        $values = static::getValues($prefix, $match_case);
+
+        return (boolean) array_search($value, $values, true);
+    }
+
+    /**
+     * Returns the enum with the specified key.
+     *
+     * @param mixed $key the key used to get the enum.
+     * @param string $prefix returns the part of that name is start with the specified prefix.
+     * @param bool $match_case the default value is true, match case when comparing name prefix.
+     * @return static|null the enum if the specified key is exists.
+     */
+    public final static function byKey($key, $prefix = '', $match_case = true)
+    {
+        $enums = static::getEnums($prefix, $match_case);
+
+        if(!array_key_exists($key, $enums)) {
+            return null;
+        }
+
+        return $enums[$key];
+    }
+
+    /**
+     * Returns the enum with the specified value.
+     *
+     * @param mixed $value the value used to get the enum.
+     * @param string $prefix returns the part of that name is start with the specified prefix.
+     * @param bool $match_case the default value is true, match case when comparing name prefix.
+     * @return static|null the enum if the specified value is exists.
+     */
+    public final static function byValue($value, $prefix = '', $match_case = true)
+    {
+        $values = static::getValues($prefix, $match_case);
+
+        $key = array_search($value, $values, true);
+
+        if(false === $key) {
+            return null;
+        }
+
+        return self::byKey($key, $prefix, $match_case);
     }
 
 }

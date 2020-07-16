@@ -2,181 +2,72 @@
 
 namespace PhpEnum;
 
+use ErrorException;
+use InvalidArgumentException;
+use LengthException;
+
 /**
  * Class ListEnum
  *
  * @author yinfuyuan <yinfuyuan@gmail.com>
  * @link https://github.com/yinfuyuan/php-enum
- *
- * @property mixed A
- * @property mixed B
- * @property mixed C
- * @property mixed D
- * @property mixed E
- * @property mixed F
- * @property mixed G
- * @property mixed H
- * @property mixed I
- * @property mixed J
- * @property mixed K
- * @property mixed L
- * @property mixed M
- * @property mixed N
- * @property mixed O
- * @property mixed P
- * @property mixed Q
- * @property mixed R
- * @property mixed S
- * @property mixed T
- * @property mixed U
- * @property mixed V
- * @property mixed W
- * @property mixed X
- * @property mixed Y
- * @property mixed Z
  */
 abstract class ListEnum extends Enum
 {
 
     /**
-     * Constant representing enum attribute length.
+     * ListEnum constructor. Programmers cannot invoke this constructor, and should get the instance by magic function.
      *
-     * @var integer
+     * @param string $name the name of this enum constant.
+     * @param array $value the value of this enum constant.
+     *
+     * @throws ErrorException if list enum function not implemented.
+     * @throws InvalidArgumentException if list enum constant type is not array.
+     * @throws LengthException if list enum length does not adhere to defined length.
      */
-    protected static $ENUM_LENGTH = 0;
-
-    /**
-     * Create a new list enum instance.
-     *
-     * @param array $attribute
-     * @return void
-     *
-     * @throws \InvalidArgumentException
-     * @throws \LengthException
-     */
-    public function __construct($attribute)
+    protected function __construct($name, $value)
     {
-        parent::__construct($attribute);
-        if(!is_array($attribute)) {
-            throw new \InvalidArgumentException('Enum attribute only accepts array.');
+        if(!is_array($value)) {
+            throw new InvalidArgumentException('List enum constant only accepts array');
         }
-        if(empty(self::getLength())) {
-            throw new \LengthException('Enum attribute length must be greater than zero');
+
+        $length = static::length();
+        if(!is_int($length) || $length <= 0) {
+            throw new LengthException('List enum constant length must be greater than zero');
         }
-        $attributeCount = count($attribute);
-        if(self::getLength() != $attributeCount) {
-            throw new \LengthException('Enum attribute length does not adhere to a defined valid length');
+
+        if($length != count($value)) {
+            throw new LengthException('List enum constant length does not adhere to defined length');
         }
-        $reflectionClass = new \ReflectionClass(static::class);
-        $properties = $reflectionClass->getProperties(\ReflectionProperty::IS_PRIVATE | \ReflectionProperty::IS_PROTECTED);
-        $value = array_shift($attribute);
-        $attributeCount--;
-        foreach ($properties as $property) {
-            if(!$property->isStatic() && strstr($property->getName(), 'enum_') && $attributeCount >= self::$ENUM_LENGTH) {
-                $property->setAccessible(true);
-                $property->setValue($this, $value);
-                $value = array_shift($attribute);
-                $attributeCount--;
-            }
-        }
+
+        parent::__construct($name, $value);
+
+        $this->ListEnum($value);
     }
 
     /**
-     * Dynamically access attribute.
+     * ListEnum function. Programmers cannot invoke this constructor,
+     * and must override this function to assign values to properties.
      *
-     * @param string $name
-     * @return mixed|null
+     * @param array $list the value of this enum constant, and here it is expected to be used assign variables as list.
+     * @example list(mixed $var1 [, mixed $... ]) = $list;
      *
-     * @throws \InvalidArgumentException
-     * @throws \OutOfRangeException
+     * @throws ErrorException if list enum function not implemented.
      */
-    public function __get($name)
+    protected function ListEnum($list)
     {
-        $letters = str_split('ABCDEFGHIJKLMNOPQRSTTUVWXYZ');
-        if(in_array($name, $letters)) {
-            return $this->get(array_search($name, $letters));
-        }
-        $index = [];
-        if(!preg_match('/\d+/',$name,$index)){
-            throw new \InvalidArgumentException('Undefined enum property');
-        }
-        return $this->get(intval(reset($index)));
+        throw new ErrorException('List enum function not implemented');
     }
 
     /**
-     * Get the enum using the index.
+     * Returns list enum constant length.
+     * Programmers must override this function to returns a integers greater than zero.
      *
-     * @param integer $index
-     * @return mixed
-     *
-     * @throws \InvalidArgumentException
-     * @throws \OutOfRangeException
+     * @return int list enum constant length
      */
-    public function get($index)
+    public static function length()
     {
-
-        if(!is_int($index)) {
-            throw new \InvalidArgumentException('Enum index only accepts integer');
-        }
-
-        if($index < 0 || $index >= self::getLength()) {
-            throw new \OutOfRangeException("Enum index out of defined range");
-        }
-
-        $value = array_values(parent::getValue());
-
-        return $value[$index];
-
-    }
-
-    /**
-     * Search relation enum values.
-     *
-     * @param int $index
-     * @param int $relation_index
-     * @param string $prefix
-     * @return array
-     *
-     * @throws \InvalidArgumentException
-     * @throws \OutOfRangeException
-     */
-    public function searchRelations($index, $relation_index, $prefix = '')
-    {
-
-        if(!is_int($relation_index)) {
-            throw new \InvalidArgumentException('Enum index only accepts integer');
-        }
-
-        if($relation_index < 0 || $relation_index >= self::getLength()) {
-            throw new \OutOfRangeException("Enum index out of defined range");
-        }
-
-        $value = $this->get($index);
-
-        $values = static::getValues($prefix);
-
-        if(empty($values)) {
-            return [];
-        }
-
-        foreach ($values as $k => $v) {
-            if(empty($v[$relation_index]) || $v[$relation_index] != $value) {
-                unset($values[$k]);
-            }
-        }
-
-        return $values;
-
-    }
-
-    /**
-     * Get enum attribute length.
-     *
-     * @return int
-     */
-    public static function getLength()
-    {
-        return static::$ENUM_LENGTH;
+        return 0;
     }
 
 }
