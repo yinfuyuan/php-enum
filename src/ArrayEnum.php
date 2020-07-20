@@ -44,7 +44,7 @@ abstract class ArrayEnum extends ListEnum
     /**
      * Get the array enum key.
      *
-     * @return mixed
+     * @return mixed the array enum key.
      */
     public final function getKey()
     {
@@ -54,7 +54,7 @@ abstract class ArrayEnum extends ListEnum
     /**
      * Get the array enum value.
      *
-     * @return mixed
+     * @return mixed the array enum value.
      */
     public final function getValue()
     {
@@ -67,7 +67,7 @@ abstract class ArrayEnum extends ListEnum
      * When comparing with floating point numbers, you may get unexpected results.
      * @link https://www.php.net/manual/en/language.types.float.php
      *
-     * @param string $key the key to be compared for equality with this enum key.
+     * @param mixed $key the key to be compared for equality with this enum key.
      * @param bool $strict the default value is true, and the strict mode is used for compared.
      * @return bool true if the specified key is equal to this enum key.
      */
@@ -96,25 +96,27 @@ abstract class ArrayEnum extends ListEnum
      *
      * @param string $prefix returns the part of that name is start with the specified prefix.
      * @param bool $match_case the default value is true, match case when comparing name prefix.
-     * @return string[] all the enum keys.
+     * @return array all the enum keys.
      */
     public final static function getKeys($prefix = '', $match_case = true)
     {
-        $values = static::getValues($prefix, $match_case);
+        $keys = [];
 
-        if(empty($values)) {
-            return [];
+        $values = self::values($prefix, $match_case);
+
+        foreach ($values as $value) {
+            $keys[] = reset($value);
         }
 
-        return array_keys($values);
+        return $keys;
     }
 
     /**
-     * Returns all the enum values and uses the key as the key.
+     * Returns all the enum values.
      *
      * @param string $prefix returns the part of that name is start with the specified prefix.
      * @param bool $match_case the default value is true, match case when comparing name prefix.
-     * @return array all the enum values and uses the key as the key.
+     * @return array all the enum values.
      */
     public static function getValues($prefix = '', $match_case = true)
     {
@@ -123,30 +125,24 @@ abstract class ArrayEnum extends ListEnum
         $valueArray = self::values($prefix, $match_case);
 
         foreach ($valueArray as $value) {
-            $values[reset($value)] = end($value);
+            $values[] = end($value);
         }
 
         return $values;
     }
 
     /**
-     * Returns all the enum instances and uses the key as the key.
+     * Returns all the enum instances.
      *
      * @param string $prefix returns the part of that name is start with the specified prefix.
      * @param bool $match_case the default value is true, match case when comparing name prefix.
-     * @return static[] all the enum instances and uses the key as the key.
+     * @return static[] all the enum instances.
      */
     public final static function getEnums($prefix = '', $match_case = true)
     {
-        $enums = [];
+        $enums = self::enums($prefix, $match_case);
 
-        $enumArray = self::enums($prefix, $match_case);
-
-        foreach ($enumArray as $enum) {
-            $enums[$enum->getKey()] = $enum;
-        }
-
-        return $enums;
+        return array_values($enums);
     }
 
     /**
@@ -159,9 +155,9 @@ abstract class ArrayEnum extends ListEnum
      */
     public final static function hasKey($key, $prefix = '', $match_case = true)
     {
-        $values = static::getValues($prefix, $match_case);
+        $keys = static::getKeys($prefix, $match_case);
 
-        return array_key_exists($key, $values);
+        return array_search($key, $keys, true) !== false;
     }
 
     /**
@@ -176,7 +172,7 @@ abstract class ArrayEnum extends ListEnum
     {
         $values = static::getValues($prefix, $match_case);
 
-        return (boolean) array_search($value, $values, true);
+        return array_search($value, $values, true) !== false;
     }
 
     /**
@@ -189,13 +185,18 @@ abstract class ArrayEnum extends ListEnum
      */
     public final static function byKey($key, $prefix = '', $match_case = true)
     {
+        $static = null;
+
         $enums = static::getEnums($prefix, $match_case);
 
-        if(!array_key_exists($key, $enums)) {
-            return null;
+        foreach ($enums as $enum) {
+            if($enum->keyEquals($key)) {
+                $static = $enum;
+                break;
+            }
         }
 
-        return $enums[$key];
+        return $static;
     }
 
     /**
@@ -208,15 +209,18 @@ abstract class ArrayEnum extends ListEnum
      */
     public final static function byValue($value, $prefix = '', $match_case = true)
     {
-        $values = static::getValues($prefix, $match_case);
+        $static = null;
 
-        $key = array_search($value, $values, true);
+        $enums = static::getEnums($prefix, $match_case);
 
-        if(false === $key) {
-            return null;
+        foreach ($enums as $enum) {
+            if($enum->valueEquals($value)) {
+                $static = $enum;
+                break;
+            }
         }
 
-        return self::byKey($key, $prefix, $match_case);
+        return $static;
     }
 
 }

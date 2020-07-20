@@ -239,7 +239,7 @@ abstract class Enum
     {
         $values = static::values($prefix, $match_case);
 
-        return (boolean) array_search($value, $values, true);
+        return array_search($value, $values, true) !== false;
     }
 
     /**

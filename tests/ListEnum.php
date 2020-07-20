@@ -3,54 +3,75 @@
 namespace PhpEnum\Tests;
 
 /**
- * @method static self CITY_BEIJING
- * @method static self CITY_LIAONING
- * @method static self CITY_SHENYANG
- * @method static self CITY_DALIAN
+ * @method static self EMPTY
+ * @method static self ONE
+ * @method static self TWO
  */
 class ListEnum extends \PhpEnum\ListEnum
 {
 
-    protected static $ENUM_LENGTH = 3;
+    const EMPTY = [0, 0.0, -0, '', [], FALSE, NULL];
+    const ONE = [1, 1.0, -1, '1', [1], TRUE, NULL];
+    const TWO = [2, 2.0, -2, '2', [2], TRUE, NULL];
 
-    const CITY_BEIJING = [110000, 110000, 'beijingshi']; // beijingshi
-    const CITY_LIAONING = [0, 22000, 'liaoningsheng']; // liaoningsheng
-    const CITY_SHENYANG = [22000, 210100, 'shengyangshi']; // shengyangshi
-    const CITY_DALIAN = [22000, 210200, 'dalianshi']; // dalianshi
-
-    private $pcode; // province code
-    private $code; // city code
-    private $name; // city name
-
-    /**
-     * @inheritDoc
-     */
-    public function ListEnum($list)
-    {
-        list($this->pcode, $this->code, $this->name) = $list;
-    }
+    private $integer;
+    private $float;
+    private $number;
+    private $string;
+    private $array;
+    private $boolean;
+    private $null;
 
     /**
      * @inheritDoc
      */
-    public static function length()
+    protected final function ListEnum($list)
     {
-        return 3;
+        list($this->integer, $this->float, $this->number, $this->string,
+            $this->array, $this->boolean, $this->null) = $list;
     }
 
-    public function getPCode()
+    /**
+     * @inheritDoc
+     */
+    public final static function length()
     {
-        return $this->pcode;
+        return 7;
     }
 
-    public function getCode()
+    public final function getInteger()
     {
-        return $this->code;
+        return $this->integer;
     }
 
-    public function getName()
+    public final function getFloat()
     {
-        return $this->name;
+        return $this->float;
+    }
+
+    public final function getNumber()
+    {
+        return $this->number;
+    }
+
+    public final function getString()
+    {
+        return $this->string;
+    }
+
+    public final function getArray()
+    {
+        return $this->array;
+    }
+
+    public final function getBoolean()
+    {
+        return $this->boolean;
+    }
+
+    public final function getNull()
+    {
+        return $this->null;
     }
 
 }

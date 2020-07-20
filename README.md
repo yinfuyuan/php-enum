@@ -2,13 +2,13 @@
 
 # Overview
 
-Reading this document assumes that you already know the basics of enumeration. If not, consult the documentation first.
+As you read this document, assume that you already understand the basic concepts of enumerations. Otherwise you might be confused by parts of the document.
 
-Enums can be used in every project, but they are defined and used in different ways. In PHP, most enums exist as either constants or static variables.
+Enumerations maybe used in every project, and in PHP they are usually replaced by a set of constants or static variables. But in complex situations where there are combinations or associations between attributes, using enumerations can significantly reduce development and maintenance costs.
 
-PHP has provided us with enumeration classes through the SPL class library, but unfortunately it needs to be installed in an extended way and the methods provided are limited.
+PHP official by SPL class library has provided us enumeration class [SplEnum](https://www.php.net/manual/en/class.splenum.php) , but first you need to install it in the form of extension, secondly it usually need to encapsulation to good use.
 
-As a result, developers provide many excellent enumeration libraries, but many times the enumeration values we need are not single, so this library provides support for multiple enumeration values.
+This enum class by reference [JAVA Enum](https://docs.oracle.com/javase/8/docs/api/java/lang/Enum.html) , which implements a simple and easy to use but powerful enum class library.
 
 ## Install
 
@@ -16,19 +16,35 @@ As a result, developers provide many excellent enumeration libraries, but many t
     
 ## Document
 
-All enumeration classes are abstract classes, which cannot be directly instantiated. Enumeration properties need to be defined after inheritance, and the inherited subclasses cannot get the instance in the way of new.
+When defining an enumeration, only constants defined by the const keyword decorated with public or protected will be recognized by the enumeration class, where public can be omitted.
+All enumeration classes are abstract classes. Enumeration classes are constructed in a protected way that cannot be instantiated and can only be obtained through the methods provided by enumeration classes.
+Because of PHP's floating-point type precision, when an enumerated property contains a floating-point type value, you should not trust any alignment or lookup based on that floating-point type. See [floating point precision](https://www.php.net/manual/en/language.types.float.php) .
+If you have the same enumeration constant value in the same enumeration object, you should use prefixes in both the definition and the use of the group, otherwise you should not trust the results of a comparison or lookup with the same enumeration constant value.
 
 * ### Enum [src](https://github.com/yinfuyuan/php-enum/blob/master/src/Enum.php) [tests](https://github.com/yinfuyuan/php-enum/blob/master/tests/EnumTest.php)
 
-The enumeration value of the underlying enumeration has no type limitation, but all the enumeration values of the same enumeration class should have the same type. When the enumeration property value is null or the enumeration property is not defined, null will be returned.
+The base enumeration is single-value type enumeration. The enumeration class does not enforce type constraints on the enumeration constant values, but you should always make each set of enumeration constant values of the same type.
+All getters in the base enumeration omit get, which is reserved for subclasses that implement getters.
 
-However, if the constant is not defined, an e_warn-level error is generated. An ErrorException exception is thrown in the partial version, so the use of null values should be avoided
+The basic enumeration provides the following methods
 
-The following takes user enumeration as an example to introduce the use of basic enumeration. In the following definition, enumeration includes both the gender of the user and the state of the user, and the two groups of enumeration are distinguished by different prefixes
+```
+name                : Gets the name of the enumeration
+value               : Gets the value of the enumeration
+equals              : Determines whether the current enumeration is equal to the given enumeration
+nameEquals          : Determines whether the name of the enumeration is equal to the given name
+valueEquals         : Determines whether the enumerated value is equal to the given value
+names               : [static method]Gets all the names enumerated, returns as data, if a name prefix is specified, returns only the portion of the specified name prefix
+values              : [static method]Gets all the values of the enumeration, returned as data, the key of the array as the enumeration name, and returns only the portion of the specified name prefix if the name prefix is specified
+enums               : [static method]Gets all instances of the enumeration, returns as data, the key of the array as the enumeration name, and returns only the portion of the specified name prefix if the name prefix is specified
+hasName             : [static method]Determines whether an enumeration name exists and, if a name prefix is specified, determines only the portion of the specified name prefix
+hasValue            : [static method]Determines whether an enumerated constant value exists and, if a name prefix is specified, only the portion of the specified name prefix
+byName              : [static method]Gets an enumeration instance based on the enumeration name and, if a name prefix is specified, judges only the portion of the specified name prefix
+byValue             : [static method]Gets the enumeration instance based on the enumeration constant value and, if a name prefix is specified, judges only the portion of the specified name prefix
+count               : [static method]Returns the number of enumerated properties, and if a name prefix is specified, determines only the portion of the specified name prefix
+```
 
-You should also use prefix arguments when looking up or getting a set of properties, otherwise you will fail to get the expected results because two of the same values will cause key conflicts. You can also split the enumeration of users
-
-Are defined as gender enumeration and state enumeration, respectively
+The following is an example of defining a user enumeration to introduce the use of the basic enumeration. The following user enumeration contains two sets of enumeration constant values for the user's gender and state, using the SEX and STATUS prefixes, respectively.
 
     /**
      * @method static self SEX_MAN
@@ -44,145 +60,125 @@ Are defined as gender enumeration and state enumeration, respectively
         const STATUS_INVALID = 9;
     }
     
-Get an example of a male gender in the following way
+The enumeration object can be obtained through the following method. The enumeration object will be cached after it is created for the first time. The enumeration object obtained through any method is always the same.
 
-    UserEnum::SEX_MAN();
+    UserEnum::SEX_MAN(); // If an instance is not created, only an instance of the current enumerated constant value is created and returned, which is recommended
+    UserEnum::byName('SEX_MAN'); // If there are uncreated instances, all instances of uncreated enumerated constant values are created and the current instance is returned
+    UserEnum::byValue(1,'SEX'); // If the current group has uncreated instances, an instance of all uncreated enumeration constant values for the current group is created, and then the current instance is returned
+    UserEnum::enums('SEX')['SEX_MAN']; // If the current group has uncreated instances, an instance of all uncreated enumeration constant values for the current group is created, and then the current instance is returned
     
-The basic enumeration provides the following methods
-    
-```
-getKey              : Gets the name of the enumeration
-getValue            : Gets the value of the enumeration
-keyEquals           : Whether the key of the enumeration is equal to the given key（==）
-valueEquals         : Whether the value of an enumeration is equal to a given value（==）
-getKeys             : [static method] gets all the keys enumerated and returns them as data. If the key prefix is specified, only the specified key prefix is searched
-getValues           : [static method] gets all values of the enumeration and returns them in the form of data. The key of the array is the enumeration name. If the key prefix is specified, only the specified key prefix will be searched
-keyExist            : [static method] read whether the specified key exists in the enumeration, and if the key prefix is specified, only look it up according to the specified key prefix
-valueExist          : [static method] determines whether the specified value exists in the enumeration. If the key prefix is specified, only the specified key prefix is searched
-searchKey           : [static method] look up the key value according to the specified value. If the key prefix is specified, look up only according to the specified key prefix
-searchValue         : [static method] look up the value according to the specified key. If the key prefix is specified, look up only according to the specified key prefix
-getSize             : [static method] returns the number of enumerated properties, and if the key prefix is specified, only the specified key prefix is searched
-```
-
-The basic enumeration can be combined with the validator of the framework to determine the domain value
-    
-    ['sex' => 'required|in:' . implode(',', UserEnum::getValues('sex'))];
-    
-    in_array($sex, UserEnum::getValues('sex'));
-    
-It can also be assigned or judged as a default property
-
-    $user->status = UserEnum::SEX_MAN()->getValue();
-
-    UserEnum::SEX_MAN()->valueEquals($user->status);
-
 * ### ListEnum [src](https://github.com/yinfuyuan/php-enum/blob/master/src/ListEnum.php) [tests](https://github.com/yinfuyuan/php-enum/blob/master/tests/ListEnumTest.php)
 
-List enumeration inherits from the underlying enumeration. Enumeration properties are limited to one-dimensional arrays of unfixed length, and the length of the enumeration property is specified by overriding the static constant **$ENUM_LENGTH** after the enumeration of the inherited list
+List enumeration inherits from the base enumeration and is many-valued, where many-values are implemented by array elements, so the type of the enumeration constant value must be defined as an array, and the length of the array must be specified by the **length** method of the list enumeration class.
+List enumeration for enum constants in each array element defines a private property as the carrier, and then rewrite the list enumeration class ListEnum * * * * method will receive the data elements assigned to fixed property, often use [list](https://www.php.net/manual/en/function.list.php) for distribution.
+List enumerations need to provide getters for each carrier property, but setters should not be provided to prevent the enumeration structure from being corrupted.
+List enumerations inherit all the methods of the underlying enumeration, but since list enumerations are of array type, **valueEquals** values** *hasValue** *byValue** These methods using enumeration constant values usually don't make much sense.
 
-The following takes city enumeration as an example to introduce the use of list enumeration. In the following definition, enumeration length is 3, which respectively represents the province code, city code and city name
+List enumerations provide the following methods
+
+```
+ListEnum            : List enumeration class with the same name method, accepts the current enumeration constant value and needs to be overridden
+length              :[static method]Returns the number of enumeration constant value elements in the list, which needs to be overridden
+```
+
+The following takes the city enumeration as an example to introduce the use of list enumeration. The enumeration constant length in the following city enumeration is 3, including the province code, city code and city name.
 
     /**
+     * @method static self PROVINCE_LIAONING
      * @method static self CITY_BEIJING
-     * @method static self CITY_LIAONING
      * @method static self CITY_SHENYANG
      * @method static self CITY_DALIAN
      */
     class CityEnum extends \PhpEnum\ListEnum
     {
-        protected static $ENUM_LENGTH = 3;
-        const CITY_BEIJING = ['110000', '110000', 'BEIJINGSHI'];
-        const CITY_LIAONING = ['22000', '22000', 'LIAONINGSHENG'];
-        const CITY_SHENYANG = ['22000', '210100', 'SHENYANGSHI'];
-        const CITY_DALIAN = ['22000', '210200', 'DALIANSHI'];
-        private $enum_pcode;
-        private $enum_code;
-        private $enum_name;
-        public function getPcode()
+        const PROVINCE_LIAONING = ['0', '22000', 'Liaoning'];
+        const CITY_BEIJING = ['110000', '110000', 'Beijing'];
+        const CITY_SHENYANG = ['22000', '210100', 'Shengyang'];
+        const CITY_DALIAN = ['22000', '210200', 'Dalian'];
+        private $province;
+        private $city;
+        private $name;
+        protected final function ListEnum($list)
         {
-            return $this->enum_pcode;
+            list($this->province, $this->city, $this->name) = $list;
         }
-        public function getCode()
+        public final static function length()
         {
-            return $this->enum_code;
+            return 3;
+        }
+        public function getProvince()
+        {
+            return $this->province;
+        }
+        public function getCity()
+        {
+            return $this->city;
         }
         public function getName()
         {
-            return $this->enum_name;
+            return $this->name;
         }
     }
     
-The enumeration example of shenyang city is obtained in the following way
+Gets the city enumeration property value
 
-    CityEnum::CITY_SHENYANG();
+    CityEnum::PROVINCE_LIAONING()->getProvince(); // string(1) "0"
+    CityEnum::PROVINCE_LIAONING()->getCity(); // string(5) "22000"
+    CityEnum::PROVINCE_LIAONING()->getName(); // string(8) "Liaoning"
     
-List enumerations inherit from the methods of the underlying enumeration and provide the following methods
+Gets cities to enumerate all provinces and cities, respectively
     
-```
-get                 : Gets the value of the specified index
-searchRelations     : Gets the value of the relationship enumeration
-getLength           : [static method] gets the enumeration property length
-```
-
-List enumerations provide two quick ways to access the list because the length of the enumeration properties is not fixed
-
-1. By accessing the enumeration of nonexistent property names containing numeric subscripts, for example:
+    CityEnum::enums('PROVINCE'); // Gets all province enumerations
+    CityEnum::enums('province', false); // Gets all province enumerations
     
-    CityEnum::CITY_SHENYANG()->property0 // An element that represents access to an array of enumerated attributes subscript 0, and so on
-    
-2. If the enumeration property is no longer than 26, the list enumeration provides access to large letters instead of numeric subscripts. For example:
-
-    CityEnum::CITY_SHENYANG()->A // An element that represents access to an array of enumerated attributes subscript 0, and so on
-    
-In addition to the above two shortcuts, it is recommended that you provide an attribute for each element, as defined by CityEnum, starting with a lowercase enum_, private or protected, and providing a getter,
-
-Do not provide setters, as this may break the enumeration structure. When you get a list enumeration instance, the attributes of each element are automatically initialized in the order defined. Note that the number of properties and the length of enumeration properties should be the same.
-
-List enumeration can be used to find the parent city enumeration value by the following method
-
-    CityEnum::CITY_SHENYANG()->searchRelations(0, 1)
-    
-List enumeration can be used to find all the child city enumeration values by the following method
-
-    CityEnum::CITY_LIAONING()->searchRelations(1, 0)
+    CityEnum::enums('CITY'); // Gets all city enumerations
+    CityEnum::enums('city', false); // Gets all city enumerations
     
 * ### ArrayEnum [src](https://github.com/yinfuyuan/php-enum/blob/master/src/ArrayEnum.php) [tests](https://github.com/yinfuyuan/php-enum/blob/master/tests/ArrayEnumTest.php)
 
-The array enumeration inherits from the list enumeration, and the enumeration property is fixed to 2 in length, always taking the first element as the key and the second element as the value
+Array enumeration inherits from list enumeration, for double-value type enumeration, array enumeration constant value always has two elements, the first element is the key, the second element is the value.
+**valueEquals** *hasValue** *byValue** These inherited and underlying enumeration methods have been overridden to use the second element of the constant value as value.
 
-Let's take the error code as an example to introduce the use of array enumeration. In the following definition, key is the error code and value is the error description
+Array enumerations provide the following methods
 
-        /**
-         * @method static self OK
-         * @method static self UNKNOWN_ERROR
-         * @method static self ERROR_DATA_VALIDATION
-         * @method static self ERROR_USER_INVALID
-         * @method static self ERROR_CONFIG_ERROR
-         */
-        class ErrorCodeEnum extends \PhpEnum\ArrayEnum
-        {
-            const OK = ['0', 'ok'];
-            const UNKNOWN_ERROR = ['99999', 'Unknown error'];
-            const ERROR_DATA_VALIDATION = ['10047', 'The given data was invalid'];
-            const ERROR_USER_INVALID = ['10010', 'User credentials was invalid'];
-            const ERROR_CONFIG_ERROR = ['10031', 'Config info is error'];
-        }
-        
-Get an error-free enumeration instance in the following manner
-
-    ErrorCodeEnum::OK();
-    
-Array enumerations inherit from the methods of the base and list enumerations and provide the following methods
-    
 ```
-getEnumKey          : Get the enumeration name
-getEnumValue        : Get enumeration values
-getKey              : [rewrite] Gets the first element of the enumeration value
-getValue            : [rewrite] Gets the second element of the enumeration value
-getValues           : [rewrite] Key is the first element of the enumeration value, and value is the second element of the enumeration value. If the key prefix is specified, only the specified key prefix will be searched
+getKey              : Gets the first element of the data enumeration constant value
+getValue            : Gets the second element of the data enumeration constant value
+keyEquals           : Determines whether the first element of the data enumeration constant value is equal to the given value
+valueEquals         : Determines whether the second element of the data enumeration constant value is equal to the given value
+getKeys             : [static method]Gets a collection of data that enumerates the first element of a constant value, returns as data, and returns only the portion of the specified name prefix if one is specified
+getValues           : [static method]Gets a collection of data that enumerates the first element of a constant value, returns as data, and returns only the portion of the specified name prefix if one is specified
+getEnums            : [static method]Gets an array to enumerate all instances, returning as data, and returns only the portion of the specified name prefix if specified
+hasKey              : [static method]Determines whether the first element of a data enumeration constant value exists and, if a name prefix is specified, determines only the portion of the specified name prefix
+hasValue            : [static method]Determines whether the second element of the data enumeration constant value exists and, if a name prefix is specified, determines only the portion of the specified name prefix
+byKey               : [static method]Gets the enumeration instance from the first element of the data enumeration constant value, judging only the portion of the specified name prefix if it is specified
+byValue             : [static method]Gets the enumeration instance based on the second element of the data enumeration constant value and, if a name prefix is specified, judges only the portion of the specified name prefix
 ```
 
-To return a uniform error code, you need an exception class to handle it
+The following takes uniform error code as an example to introduce the use of array enumeration. In the following error code enumeration, key is error code and value is error description
+
+    /**
+     * @method static self OK
+     * @method static self UNKNOWN_ERROR
+     * @method static self ERROR_DATA_VALIDATION
+     * @method static self ERROR_USER_INVALID
+     * @method static self ERROR_CONFIG_ERROR
+     */
+    class ErrorCodeEnum extends \PhpEnum\ArrayEnum
+    {
+        const OK = ['0', 'ok'];
+        const UNKNOWN_ERROR = ['99999', 'Unknown error'];
+        const ERROR_DATA_VALIDATION = ['10000', 'The given data was invalid'];
+        const ERROR_USER_INVALID = ['20000', 'User credentials was invalid'];
+        const ERROR_CONFIG_ERROR = ['30000', 'Config info is error'];
+    }
+    
+You can get error codes and error descriptions in the following ways
+
+    ErrorCodeEnum::OK()->getKey(); // string(1) "0"
+    ErrorCodeEnum::OK()->getValue(); // string(2) "ok"
+    
+To implement the return uniform format error code, you also need to customize the exception class
 
     class ApiException extends Exception
     {
@@ -192,39 +188,29 @@ To return a uniform error code, you need an exception class to handle it
             parent::__construct($enum->getValue(), $enum->getKey());
             $this->data = $data;
         }
-        public function report()
+        public function toArray()
         {
-            // todo log
-        }
-        public function render($request)
-        {
-            return response([
+            return [
                 'code' => $this->getCode(),
                 'msg' => $this->getMessage(),
                 'data' => $this->data
-            ]);
+            ];
         }
     }
     
-Define a successful return format with the help of the framework
-
-    Response::macro('caps', function ($data) {
-        return [
-            'code' => ErrorCodeEnum::OK()->getKey(),
-            'msg' => ErrorCodeEnum::OK()->getValue(),
-            'data' => $data,
-        ];
-    });
-    
-Returns the result of success
-
-    return response()->caps('');
-    // {"code":"0","msg":"ok","data":""}
-    
-Returns the result of a failure
+When a failed result is returned, a custom exception is thrown and an error code enumeration is specified
 
     throw new ApiException(ErrorCodeEnum::ERROR_DATA_VALIDATION());
-    // {"code":10047,"msg":"The given data was invalid","data":""}
+    // {"code":10000,"msg":"The given data was invalid","data":""}
     
     throw new ApiException(ErrorCodeEnum::ERROR_USER_INVALID(),'This is data');
-    // {"code":10010,"msg":"User credentials was invalid","data":"This is data"}
+    // {"code":20000,"msg":"User credentials was invalid","data":"This is data"}
+    
+Results that return success should be defined separately
+
+    return [
+        'code' => ErrorCodeEnum::OK()->getKey(),
+        'msg' => ErrorCodeEnum::OK()->getValue(),
+        'data' => ''，
+    ];
+    // {"code":"0","msg":"ok","data":""}

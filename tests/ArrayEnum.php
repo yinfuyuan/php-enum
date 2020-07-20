@@ -3,23 +3,43 @@
 namespace PhpEnum\Tests;
 
 /**
- * @method static self OK
+ * @method static self BOOLEAN_TRUE
+ * @method static self BOOLEAN_FALSE
  *
- * @method static self UNKNOWN_ERROR
+ * @method static self INTEGER_ZERO
+ * @method static self INTEGER_ONE
+ * @method static self INTEGER_TWO
  *
- * @method static self ERROR_DATA_VALIDATION
- * @method static self ERROR_USER_INVALID
- * @method static self ERROR_CONFIG_ERROR
+ * @method static self FLOAT_ZERO
+ * @method static self FLOAT_ONE
+ *
+ * @method static self STRING_EMPTY
+ * @method static self STRING_ONE
+ *
+ * @method static self ARRAY_EMPTY
+ * @method static self ARRAY_ONE
+ *
+ * @method static self NULL_NULL
  */
 class ArrayEnum extends \PhpEnum\ArrayEnum
 {
 
-    const OK = [0, 'ok'];
+    const BOOLEAN_TRUE = [TRUE, 'true'];
+    const BOOLEAN_FALSE = [FALSE, 'false'];
 
-    const UNKNOWN_ERROR = [99999, 'Unknown error'];
+    const INTEGER_ZERO = [0, 'zero'];
+    const INTEGER_ONE = [1, 'one'];
+    const INTEGER_TWO = [-2, 'two'];
 
-    const ERROR_DATA_VALIDATION = [10047, 'The given data was invalid'];
-    const ERROR_USER_INVALID = [10010, 'User credentials was invalid'];
-    const ERROR_CONFIG_ERROR = [10031, 'Config info is error'];
+    const FLOAT_ZERO = [0.0,'zero'];
+    const FLOAT_ONE = [1.0,'one'];
+
+    const STRING_EMPTY = ['', 'empty'];
+    const STRING_ONE = ['1', 'one'];
+
+    const ARRAY_EMPTY = [[], 'empty'];
+    const ARRAY_ONE = [[1], 'one'];
+
+    const NULL_NULL = [NULL, 'null'];
 
 }
