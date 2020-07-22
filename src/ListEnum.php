@@ -51,13 +51,8 @@ abstract class ListEnum extends Enum
      *
      * @param array $list the value of this enum constant, and here it is expected to be used assign variables as list.
      * @example list(mixed $var1 [, mixed $... ]) = $list;
-     *
-     * @throws ErrorException if list enum function not implemented.
      */
-    protected function ListEnum($list)
-    {
-        throw new ErrorException('List enum function not implemented');
-    }
+    protected abstract function ListEnum($list);
 
     /**
      * Returns list enum constant length.
@@ -65,9 +60,6 @@ abstract class ListEnum extends Enum
      *
      * @return int list enum constant length
      */
-    public static function length()
-    {
-        return 0;
-    }
+    public abstract static function length();
 
 }
