@@ -3,75 +3,59 @@
 namespace PhpEnum\Tests;
 
 /**
- * @method static self EMPTY
+ * @method static self ZERO
  * @method static self ONE
- * @method static self TWO
+ *
+ * @method integer getInteger()
+ * @method float getFloat()
+ * @method string getString()
+ * @method array getArray()
+ * @method boolean getBoolean()
+ * @method null getNull()
+ *
+ * @method boolean integerEquals($value)
+ * @method boolean floatEquals($value)
+ * @method boolean stringEquals($value)
+ * @method boolean arrayEquals($value)
+ * @method boolean booleanEquals($value)
+ * @method boolean nullEquals($value)
+ *
+ * @method static boolean containsInteger($value)
+ * @method static boolean containsFloat($value)
+ * @method static boolean containsString($value)
+ * @method static boolean containsArray($value)
+ * @method static boolean containsBoolean($value)
+ * @method static boolean containsNull($value)
+ *
+ * @method static self|null ofInteger($value)
+ * @method static self|null ofFloat($value)
+ * @method static self|null ofString($value)
+ * @method static self|null ofArray($value)
+ * @method static self|null ofBoolean($value)
+ * @method static self|null ofNull($value, $prefix = '')
  */
 class ListEnum extends \PhpEnum\ListEnum
 {
 
-    const EMPTY = [0, 0.0, -0, '', [], FALSE, NULL];
-    const ONE = [1, 1.0, -1, '1', [1], TRUE, NULL];
-    const TWO = [2, 2.0, -2, '2', [2], TRUE, NULL];
+    const ZERO = [0, 0.0, '', [], FALSE, NULL];
+    const ONE = [4+6-8, 2.45+4.234-6.4177, 'This is a very long text.', ['This' => ['is' => 'a', ['array']]], TRUE, NULL];
 
     private $integer;
     private $float;
-    private $number;
     private $string;
     private $array;
     private $boolean;
     private $null;
 
-    /**
-     * @inheritDoc
-     */
-    protected final function ListEnum($list)
+    protected function listEnumConstruct($integer = null, $float = null, $string = null,
+                                         $array = null, $boolean = null, $null = null)
     {
-        list($this->integer, $this->float, $this->number, $this->string,
-            $this->array, $this->boolean, $this->null) = $list;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public final static function length()
-    {
-        return 7;
-    }
-
-    public final function getInteger()
-    {
-        return $this->integer;
-    }
-
-    public final function getFloat()
-    {
-        return $this->float;
-    }
-
-    public final function getNumber()
-    {
-        return $this->number;
-    }
-
-    public final function getString()
-    {
-        return $this->string;
-    }
-
-    public final function getArray()
-    {
-        return $this->array;
-    }
-
-    public final function getBoolean()
-    {
-        return $this->boolean;
-    }
-
-    public final function getNull()
-    {
-        return $this->null;
+        $this->integer = $integer;
+        $this->float = $float;
+        $this->string = $string;
+        $this->array = $array;
+        $this->boolean = $boolean;
+        $this->null = $null;
     }
 
 }

@@ -2,91 +2,98 @@
 
 namespace PhpEnum\Tests;
 
+use ErrorException;
 use PHPUnit\Framework\TestCase;
 
 class ListEnumTest extends TestCase
 {
 
-    public function testEnumType()
+    public function testEnumGet()
     {
-        $this->assertTrue(ListEnum::ONE()->getBoolean());
-        $this->assertFalse(ListEnum::EMPTY()->getBoolean());
-        $this->assertIsInt(ListEnum::ONE()->getInteger());
-        $this->assertIsNumeric(ListEnum::ONE()->getNumber());
-        $this->assertIsFloat(ListEnum::ONE()->getFloat());
-        $this->assertIsString(ListEnum::ONE()->getString());
-        $this->assertIsArray(ListEnum::ONE()->getArray());
-        $this->assertNull(ListEnum::ONE()->getNull());
+        $this->assertEquals(0, ListEnum::ZERO()->getInteger());
+        $this->assertEquals(0.0, ListEnum::ZERO()->getFloat());
+        $this->assertEquals('', ListEnum::ZERO()->getString());
+        $this->assertEquals([], ListEnum::ZERO()->getArray());
+        $this->assertEquals(false, ListEnum::ZERO()->getBoolean());
+        $this->assertEquals(null, ListEnum::ZERO()->getNull());
+
+        $this->assertEquals(4+6-8, ListEnum::ONE()->getInteger());
+        $this->assertEquals(2.45+4.234-6.4177, ListEnum::ONE()->getFloat());
+        $this->assertEquals('This is a very long text.', ListEnum::ONE()->getString());
+        $this->assertEquals(['This' => ['is' => 'a', ['array']]], ListEnum::ONE()->getArray());
+        $this->assertEquals(true, ListEnum::ONE()->getBoolean());
+        $this->assertEquals(null, ListEnum::ONE()->getNull());
     }
 
-    public function testEnumName()
+    public function testEnumEquals()
     {
-        $this->assertEquals(ListEnum::EMPTY()->name(), 'EMPTY');
-        $this->assertEquals(ListEnum::ONE()->name(), 'ONE');
-        $this->assertEquals(ListEnum::TWO()->name(), 'TWO');
+        $this->assertTrue(ListEnum::ZERO()->integerEquals(0));
+        $this->assertTrue(ListEnum::ZERO()->floatEquals(0.0));
+        $this->assertTrue(ListEnum::ZERO()->stringEquals(''));
+        $this->assertTrue(ListEnum::ZERO()->arrayEquals([]));
+        $this->assertTrue(ListEnum::ZERO()->booleanEquals(false));
+        $this->assertTrue(ListEnum::ZERO()->nullEquals(null));
+
+        $this->assertTrue(ListEnum::ONE()->integerEquals(4+6-8));
+        $this->assertTrue(ListEnum::ONE()->floatEquals(2.45+4.234-6.4177));
+        $this->assertTrue(ListEnum::ONE()->stringEquals('This is a very long text.'));
+        $this->assertTrue(ListEnum::ONE()->arrayEquals(['This' => ['is' => 'a', ['array']]]));
+        $this->assertTrue(ListEnum::ONE()->booleanEquals(true));
+        $this->assertTrue(ListEnum::ONE()->nullEquals(null));
     }
 
-    public function testEnumValue()
+    public function testEnumContains()
     {
-        $this->assertEquals(ListEnum::ONE()->getInteger(), 1);
-        $this->assertEquals(ListEnum::ONE()->getFloat(), 1.0);
-        $this->assertEquals(ListEnum::ONE()->getNumber(), -1);
-        $this->assertEquals(ListEnum::ONE()->getString(), '1');
-        $this->assertEquals(ListEnum::ONE()->getArray(), [1]);
-        $this->assertEquals(ListEnum::ONE()->getBoolean(), TRUE);
-        $this->assertEquals(ListEnum::ONE()->getNull(), NULL);
+        $this->assertTrue(ListEnum::containsInteger(0));
+        $this->assertTrue(ListEnum::containsFloat(0.0));
+        $this->assertTrue(ListEnum::containsString(''));
+        $this->assertTrue(ListEnum::containsArray([]));
+        $this->assertTrue(ListEnum::containsBoolean(false));
+        $this->assertTrue(ListEnum::containsNull(null));
+
+        $this->assertTrue(ListEnum::containsInteger(4+6-8));
+        $this->assertTrue(ListEnum::containsFloat(2.45+4.234-6.4177));
+        $this->assertTrue(ListEnum::containsString('This is a very long text.'));
+        $this->assertTrue(ListEnum::containsArray(['This' => ['is' => 'a', ['array']]]));
+        $this->assertTrue(ListEnum::containsBoolean(true));
+        $this->assertTrue(ListEnum::containsNull(null));
     }
 
-    public function testEnumNameEquals()
+    public function testEnumOf()
     {
-        $this->assertTrue(ListEnum::EMPTY()->nameEquals('EMPTY'));
-        $this->assertTrue(ListEnum::ONE()->nameEquals('ONE'));
-        $this->assertTrue(ListEnum::TWO()->nameEquals('TWO'));
+        $this->assertEquals(ListEnum::ZERO(), ListEnum::ofInteger(0));
+        $this->assertEquals(ListEnum::ZERO(), ListEnum::ofFloat(0.0));
+        $this->assertEquals(ListEnum::ZERO(), ListEnum::ofString(''));
+        $this->assertEquals(ListEnum::ZERO(), ListEnum::ofArray([]));
+        $this->assertEquals(ListEnum::ZERO(), ListEnum::ofBoolean(false));
+        $this->assertEquals(ListEnum::ZERO(), ListEnum::ofNull(null, "ZE"));
+
+        $this->assertEquals(ListEnum::ONE(), ListEnum::ofInteger(4+6-8));
+        $this->assertEquals(ListEnum::ONE(), ListEnum::ofFloat(2.45+4.234-6.4177));
+        $this->assertEquals(ListEnum::ONE(), ListEnum::ofString('This is a very long text.'));
+        $this->assertEquals(ListEnum::ONE(), ListEnum::ofArray(['This' => ['is' => 'a', ['array']]]));
+        $this->assertEquals(ListEnum::ONE(), ListEnum::ofBoolean(true));
+        $this->assertEquals(ListEnum::ONE(), ListEnum::ofNull(null, "ON"));
     }
 
-    public function testEnumNames()
+    /**
+     * @throws ErrorException
+     */
+    public function testEnumArray()
     {
-        $names = ListEnum::names();
-        $this->assertContains('EMPTY', $names);
-        $this->assertContains('ONE', $names);
-        $this->assertContains('TWO', $names);
-    }
+        $this->assertArrayHasKey('ZERO', ListEnum::getProperties('integer'));
+        $this->assertArrayHasKey('ZERO', ListEnum::getProperties('float'));
+        $this->assertArrayHasKey('ZERO', ListEnum::getProperties('string'));
+        $this->assertArrayHasKey('ZERO', ListEnum::getProperties('array'));
+        $this->assertArrayHasKey('ZERO', ListEnum::getProperties('boolean'));
+        $this->assertArrayHasKey('ZERO', ListEnum::getProperties('null'));
 
-    public function testEnumValues()
-    {
-        $values = ListEnum::values();
-        $this->assertArrayHasKey('EMPTY', $values);
-        $this->assertArrayHasKey('ONE', $values);
-        $this->assertArrayHasKey('TWO', $values);
-    }
-
-    public function testEnumEnums()
-    {
-        $enums = ListEnum::enums();
-        $this->assertTrue(ListEnum::EMPTY()->equals($enums['EMPTY']));
-        $this->assertTrue(ListEnum::ONE()->equals($enums['ONE']));
-        $this->assertTrue(ListEnum::TWO()->equals($enums['TWO']));
-    }
-
-    public function testEnumHasName()
-    {
-        $this->assertTrue(ListEnum::hasName('EMPTY'));
-        $this->assertTrue(ListEnum::hasName('ONE'));
-        $this->assertTrue(ListEnum::hasName('TWO'));
-    }
-
-    public function testEnumByName()
-    {
-        $this->assertTrue(ListEnum::byName('EMPTY')->equals(ListEnum::EMPTY()));
-        $this->assertTrue(ListEnum::byName('ONE')->equals(ListEnum::ONE()));
-        $this->assertTrue(ListEnum::byName('TWO')->equals(ListEnum::TWO()));
-    }
-
-    public function testEnumCount()
-    {
-        $this->assertCount(ListEnum::count(), ListEnum::names());
-        $this->assertCount(ListEnum::count(), ListEnum::values());
-        $this->assertCount(ListEnum::count(), ListEnum::enums());
+        $this->assertArrayHasKey('ONE', ListEnum::getProperties('integer'));
+        $this->assertArrayHasKey('ONE', ListEnum::getProperties('float'));
+        $this->assertArrayHasKey('ONE', ListEnum::getProperties('string'));
+        $this->assertArrayHasKey('ONE', ListEnum::getProperties('array'));
+        $this->assertArrayHasKey('ONE', ListEnum::getProperties('boolean'));
+        $this->assertArrayHasKey('ONE', ListEnum::getProperties('null'));
     }
 
 }
