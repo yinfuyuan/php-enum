@@ -35,20 +35,20 @@ namespace PhpEnum;
  * @author   yinfuyuan <yinfuyuan@gmail.com>
  * @license  https://opensource.org/licenses/GPL-3.0 GPL-3.0
  * @link     https://github.com/yinfuyuan/php-enum
- * @see      ListEnum
+ * @see      Enum
  * @see      ListEnum
  *
  * @method mixed getKey()
  * @method mixed getValue()
  *
- * @method bool keyEquals($key)
- * @method bool valueEquals($value)
+ * @method bool keyEquals(mixed $key)
+ * @method bool valueEquals(mixed $value)
  *
- * @method static bool containsKey($value, $prefix = '')
- * @method static bool containsValue($value, $prefix = '')
+ * @method static bool containsKey(mixed $value, string $prefix = '')
+ * @method static bool containsValue(mixed $value, string $prefix = '')
  *
- * @method static self ofKey($key, $prefix = '')
- * @method static self ofValue($value, $prefix = '')
+ * @method static self ofKey(mixed $key, string $prefix = '')
+ * @method static self ofValue(mixed $value, string $prefix = '')
  */
 abstract class ArrayEnum extends ListEnum
 {

@@ -164,6 +164,18 @@ abstract class Enum
     }
 
     /**
+     * This function is used when two float values are compared.
+     * This setting takes effect globally, programmers can override this method to set scale.
+     *
+     * @return int
+     * @see    bccomp()
+     */
+    protected function compScale()
+    {
+        return 5;
+    }
+
+    /**
      * Enum construct function. Most programmers will have no use for this method.
      * It is designed for use by sophisticated enum-based data structures, such as {@see ListEnum} and {@see ArrayEnum}.
      *
@@ -243,8 +255,10 @@ abstract class Enum
     public final function enumValueEquals($value, $strict = true)
     {
         if (is_float($this->value())) {
-            return (!$strict || is_float($value)) && (extension_loaded('bcmath')
-                    ? bccomp(strval($this->value()), strval($value)) === 0 : strval($this->value()) === strval($value));
+            $scale = intval($this->compScale());
+            return (!$strict || is_float($value)) && ($scale > 0 && extension_loaded('bcmath')
+                    ? bccomp(strval($this->value()), strval($value), $scale) === 0
+                    : strval($this->value()) === strval($value));
         }
         return $strict ? $this->value() === $value : $this->value() == $value;
     }

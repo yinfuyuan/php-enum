@@ -69,7 +69,7 @@ abstract class ListEnum extends Enum
             return $this->propertyEquals(substr($name, 0, -6), reset($arguments));
         }
 
-        if (strlen($name) > 3 && substr($name, 0, 3) === 'get') {
+        if (strlen($name) > 3 && strpos($name, 'get') === 0) {
             return $this->getProperty(substr($name, 3));
         }
 
@@ -117,11 +117,11 @@ abstract class ListEnum extends Enum
         $value = reset($arguments);
         $prefix = next($arguments);
 
-        if (strlen($name) > 8 && substr($name, 0, 8) === 'contains') {
+        if (strlen($name) > 8 && strpos($name, 'contains') === 0) {
             return self::containsProperty(substr($name, 8), $value, is_string($prefix) ? $prefix : '');
         }
 
-        if (strlen($name) > 2 && substr($name, 0, 2) === 'of') {
+        if (strlen($name) > 2 && strpos($name, 'of') === 0) {
             return self::ofProperty(substr($name, 2), $value, is_string($prefix) ? $prefix : '');
         }
 
@@ -173,8 +173,10 @@ abstract class ListEnum extends Enum
         $mixed = $this->getProperty($property);
 
         if (is_float($mixed)) {
-            return (!$strict || is_float($value)) && (extension_loaded('bcmath')
-                    ? bccomp(strval($mixed), strval($value)) === 0 : strval($mixed) === strval($value));
+            $scale = intval($this->compScale());
+            return (!$strict || is_float($value)) && ($scale > 0 && extension_loaded('bcmath')
+                    ? bccomp(strval($mixed), strval($value), $scale) === 0
+                    : strval($mixed) === strval($value));
         }
 
         return $strict ? $mixed === $value : $mixed == $value;
