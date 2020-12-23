@@ -8,26 +8,26 @@
 [![Build Status](https://img.shields.io/github/workflow/status/yinfuyuan/php-enum/tests?label=tests&style=flat-square)](https://github.com/yinfuyuan/php-enum/actions?query=workflow%3Atests)
 [![Total Downloads](https://img.shields.io/packagist/dt/phpenum/phpenum.svg?style=flat-square)](https://packagist.org/packages/phpenum/phpenum)
 
-### About
-
-PHPEnum is a set of base classes that quickly implement enumeration capabilities. 
-It not only provides a full-featured single-value enumeration, 
-but also provides a more powerful multi-value enumeration. For more usage, see [wiki](https://github.com/yinfuyuan/php-enum/wiki)
-
-### Requirements
-
-PHPEnum minimum supported PHP version is 5.6
-
-- V1.* requires PHP version 5.6 or greater.
-
-- V2.* requires PHP version 7.0 or greater. // todo
-
-- V3.* requires PHP version 8.0 or greater. // todo
+PHPEnum is an enumeration class library for PHP developers. The idea comes from [Java enumeration](https://docs.oracle.com/javase/8/docs/api/java/lang/Enum.html), and using the PHP features to implement single-value enumeration and multi-value enumeration. PHPEnum runs in most PHP applications. It is easily integrated with Laravel.
 
 ### Installation
 
+**PHP version 8.***
+
     composer require phpenum/phpenum
+
+**PHP version 7.***
+
+    composer require phpenum/phpenum 2.*
+
+**PHP version 5.6+**
+
+    composer require phpenum/phpenum 1.*
 
 ### Documentation
 
-The documentation for PHPEnum is available on the Github [wiki](https://github.com/yinfuyuan/php-enum/wiki).
+The documentation for PHPEnum is available on the [Github wiki](https://github.com/yinfuyuan/php-enum/wiki).
+
+### License
+
+The PHPEnum is open-sourced software licensed under the [GPL-3.0 license](https://github.com/yinfuyuan/php-enum/blob/master/LICENSE).
