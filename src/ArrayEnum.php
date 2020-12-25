@@ -44,8 +44,8 @@ namespace PhpEnum;
  * @method bool keyEquals(mixed $key)
  * @method bool valueEquals(mixed $value)
  *
- * @method static bool containsKey(mixed $value, string $prefix = '')
- * @method static bool containsValue(mixed $value, string $prefix = '')
+ * @method static int containsKey(mixed $value, string $prefix = '')
+ * @method static int containsValue(mixed $value, string $prefix = '')
  *
  * @method static self ofKey(mixed $key, string $prefix = '')
  * @method static self ofValue(mixed $value, string $prefix = '')
@@ -74,7 +74,7 @@ abstract class ArrayEnum extends ListEnum
      *
      * @return void
      */
-    protected final function listEnumConstruct($key = null, $value = null)
+    protected final function listEnumConstruct($key, $value)
     {
         $this->key = $key;
         $this->value = $value;

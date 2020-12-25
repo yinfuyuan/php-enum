@@ -24,8 +24,10 @@
 
 namespace PhpEnum;
 
-use BadMethodCallException;
-use ErrorException;
+use InvalidArgumentException;
+use PhpEnum\Exceptions\CloneNotSupportedException;
+use PhpEnum\Exceptions\EnumConflictException;
+use PhpEnum\Exceptions\InvalidObjectException;
 use ReflectionClass;
 
 /**
@@ -96,7 +98,8 @@ abstract class Enum
      * @param array  $arguments have not used.
      *
      * @return static an instance of enum
-     * @throws ErrorException if the enum has no constant with the specified name
+     * @throws InvalidArgumentException if the specified enum type has no constant with the specified name,
+     *         or the specified class object does not represent an enum type
      * @see    Enum::callStatic()
      */
     public static final function __callStatic($name, $arguments)
@@ -130,30 +133,33 @@ abstract class Enum
      * This guarantees that enums are never cloned, which is necessary to preserve their "singleton" status.
      *
      * @return void
+     * @throws CloneNotSupportedException
      */
     public final function __clone()
     {
-        throw new BadMethodCallException("can't clone enum");
+        throw new CloneNotSupportedException();
     }
 
     /**
      * This guarantees that enums are never serialized, which is necessary to preserve their "singleton" status.
      *
      * @return void
+     * @throws InvalidObjectException
      */
     public final function __sleep()
     {
-        throw new BadMethodCallException("can't serialize enum");
+        throw new InvalidObjectException("can't serialize enum");
     }
 
     /**
      * This guarantees that enums are never deserialized, which is necessary to preserve their "singleton" status.
      *
      * @return void
+     * @throws InvalidObjectException
      */
     public final function __wakeup()
     {
-        throw new BadMethodCallException("can't deserialize enum");
+        throw new InvalidObjectException("can't deserialize enum");
     }
 
     /**
@@ -164,15 +170,18 @@ abstract class Enum
     }
 
     /**
-     * This function is used when two float values are compared.
-     * This setting takes effect globally, programmers can override this method to set scale.
+     * Returns scale is used to set the number of digits after the decimal place which will be used in the comparison.
      *
+     * Due to the special nature of PHP, it is not accurate to directly compare two floating-point types,
+     * so when bcmath extension is enabled and scale is set, the bccomp function is preferred for comparison.
+     *
+     * @link   https://www.php.net/manual/en/language.types.float.php
+     * @see    bcmath()
      * @return int
-     * @see    bccomp()
      */
-    protected function compScale()
+    protected function scale()
     {
-        return 5;
+        return 0;
     }
 
     /**
@@ -193,11 +202,12 @@ abstract class Enum
      * @param array  $arguments have not used.
      *
      * @return mixed
-     * @throws ErrorException if the enum has no constant with the specified name
+     * @throws InvalidArgumentException if the specified enum type has no constant with the specified name,
+     *         or the specified class object does not represent an enum type
      */
     protected static function callStatic($name, $arguments)
     {
-        throw new ErrorException("Enum constant is not found");
+        throw new InvalidArgumentException('No enum constant ' . static::class . '::' . $name);
     }
 
     /**
@@ -254,13 +264,16 @@ abstract class Enum
      */
     public final function enumValueEquals($value, $strict = true)
     {
-        if (is_float($this->value())) {
-            $scale = intval($this->compScale());
-            return (!$strict || is_float($value)) && ($scale > 0 && extension_loaded('bcmath')
-                    ? bccomp(strval($this->value()), strval($value), $scale) === 0
-                    : strval($this->value()) === strval($value));
+        if (!is_float($this->value())) {
+            return $strict ? $this->value() === $value : $this->value() == $value;
         }
-        return $strict ? $this->value() === $value : $this->value() == $value;
+        if ($strict && !is_float($value)) {
+            return false;
+        }
+        if ($this->scale() === 0 || !extension_loaded('bcmath')) {
+            return strval($this->value()) === strval($value);
+        }
+        return bccomp(strval($this->value()), strval($value), $this->scale()) === 0;
     }
 
     /**
@@ -269,7 +282,6 @@ abstract class Enum
      * @param string $prefix returns the part of that name is start with the specified prefix.
      *
      * @return static[] all the enum instances and uses the name as the key
-     * @throws ErrorException if an incorrect enumeration name exists
      */
     public static final function enums($prefix = '')
     {
@@ -279,7 +291,11 @@ abstract class Enum
 
         foreach ($constants as $key => $value) {
             if (empty($prefix) || strpos($key, $prefix) === 0) {
-                $enums[$key] = self::__callStatic($key, []);
+                try {
+                    $enums[$key] = self::__callStatic($key, []);
+                } catch (InvalidArgumentException $e) {
+                    continue;
+                }
             }
         }
 
@@ -292,7 +308,6 @@ abstract class Enum
      * @param string $prefix returns the part of that name is start with the specified prefix.
      *
      * @return string[] all the enum names
-     * @throws ErrorException if an incorrect enumeration name exists
      */
     public static final function names($prefix = '')
     {
@@ -307,7 +322,6 @@ abstract class Enum
      * @param string $prefix returns the part of that name is start with the specified prefix.
      *
      * @return array all the enum values and uses the name as the key
-     * @throws ErrorException if an incorrect enumeration name exists
      */
     public static final function values($prefix = '')
     {
@@ -323,39 +337,37 @@ abstract class Enum
     }
 
     /**
-     * Returns true if the specified name is exists.
+     * Returns 0 if the specified name does not exists.
      *
-     * @param mixed $name the name used to check if it exists.
+     * @param string $name   the name used to check if it exists.
+     * @param string $prefix returns the part of that name is start with the specified prefix.
      *
-     * @return bool true if the specified name is exists
-     * @throws ErrorException if an incorrect enumeration name exists
+     * @return int 1 if the specified name is exists
      */
-    public static final function containsEnumName($name)
+    public static final function containsEnumName($name, $prefix = '')
     {
-        $enums = self::enums();
+        $enums = self::enums($prefix);
 
-        return array_key_exists($name, $enums);
+        return array_key_exists($name, $enums) ? 1 : 0;
     }
 
     /**
-     * Returns true if the specified value is exists.
+     * Returns 0 if the specified value does not exists.
      *
      * @param mixed  $value  the value used to check if it exists.
      * @param string $prefix returns the part of that name is start with the specified prefix.
      *
-     * @return bool true if the specified value is exists
-     * @throws ErrorException if an incorrect enumeration name exists
+     * @return int count of enums which the enum value equals the specified value
      */
     public static final function containsEnumValue($value, $prefix = '')
     {
-        $result = false;
+        $result = 0;
 
         $enums = self::enums($prefix);
 
         foreach ($enums as $enum) {
             if ($enum->enumValueEquals($value)) {
-                $result = true;
-                break;
+                $result++;
             }
         }
 
@@ -365,14 +377,14 @@ abstract class Enum
     /**
      * Returns the enum with the specified name.
      *
-     * @param string $name the name used to get the enum.
+     * @param string $name   the name used to get the enum.
+     * @param string $prefix returns the part of that name is start with the specified prefix.
      *
      * @return static|null the enum if the specified name is exists
-     * @throws ErrorException if an incorrect enumeration name exists
      */
-    public static final function ofEnumName($name)
+    public static final function ofEnumName($name, $prefix = '')
     {
-        $enums = self::enums();
+        $enums = self::enums($prefix);
 
         if (!array_key_exists($name, $enums)) {
             return null;
@@ -388,7 +400,7 @@ abstract class Enum
      * @param string $prefix returns the part of that name is start with the specified prefix.
      *
      * @return static|null the enum if the specified value is exists
-     * @throws ErrorException if there are multiple enumerations of the same value
+     * @throws EnumConflictException if there are multiple enumerations of the same value
      */
     public static final function ofEnumValue($value, $prefix = '')
     {
@@ -400,8 +412,8 @@ abstract class Enum
             if (!$enum->enumValueEquals($value)) {
                 continue;
             }
-            if (null != $result) {
-                throw new ErrorException('There are multiple enumerations of the same value');
+            if (!is_null($result)) {
+                throw new EnumConflictException('There are multiple enumerations of the same value');
             }
             $result = $enum;
         }
@@ -415,7 +427,6 @@ abstract class Enum
      * @param string $prefix returns the part of that name is start with the specified prefix.
      *
      * @return int enums count
-     * @throws ErrorException if an incorrect enumeration name exists
      */
     public static final function count($prefix = '')
     {
@@ -428,7 +439,7 @@ abstract class Enum
      * Returns the elements of this enum class or empty array if this class does not have an enum constant.
      *
      * @return array an array containing the constants comprising the enum class represented by this class in the order
-     *      they're declared, or empty array if this class does not have an enum constant
+     *         they're declared, or empty array if this class does not have an enum constant
      */
     protected static final function getEnumConstants()
     {
@@ -440,8 +451,6 @@ abstract class Enum
 
         $reflection = new ReflectionClass(static::class);
 
-        $constants = $reflection->getConstants();
-
-        return self::$constants[$class] = $constants;
+        return self::$constants[$class] = $reflection->getConstants();
     }
 }

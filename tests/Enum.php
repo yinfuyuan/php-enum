@@ -30,7 +30,6 @@ namespace PhpEnum\Tests;
  */
 class Enum extends \PhpEnum\Enum
 {
-
     const BOOLEAN_TRUE = TRUE;
     const BOOLEAN_FALSE = FALSE;
 
@@ -58,4 +57,8 @@ EOT;
 
     const NULL_NULL = NULL;
 
+    protected function scale()
+    {
+        return 5;
+    }
 }

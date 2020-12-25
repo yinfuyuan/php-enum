@@ -36,7 +36,6 @@ namespace PhpEnum\Tests;
  */
 class ListEnum extends \PhpEnum\ListEnum
 {
-
     const ZERO = [0, 0.0, '', [], FALSE, NULL];
     const ONE = [4+6-8, 2.45+4.234-6.4177, 'This is a very long text.', ['This' => ['is' => 'a', ['array']]], TRUE, NULL];
 
@@ -47,8 +46,7 @@ class ListEnum extends \PhpEnum\ListEnum
     private $boolean;
     private $null;
 
-    protected function listEnumConstruct($integer = null, $float = null, $string = null,
-                                         $array = null, $boolean = null, $null = null)
+    protected function listEnumConstruct($integer, $float, $string, $array, $boolean, $null)
     {
         $this->integer = $integer;
         $this->float = $float;
@@ -58,4 +56,8 @@ class ListEnum extends \PhpEnum\ListEnum
         $this->null = $null;
     }
 
+    protected function scale()
+    {
+        return 5;
+    }
 }

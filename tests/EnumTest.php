@@ -2,11 +2,12 @@
 
 namespace PhpEnum\Tests;
 
-use ErrorException;
+use PhpEnum\Exceptions\EnumConflictException;
 use PHPUnit\Framework\TestCase;
 
 class EnumTest extends TestCase
 {
+
     public function testEnumType()
     {
         $this->assertInstanceOf(Enum::class, Enum::BOOLEAN_TRUE());
@@ -162,9 +163,6 @@ class EnumTest extends TestCase
         $this->assertTrue(Enum::NULL_NULL()->enumValueEquals(NULL));
     }
 
-    /**
-     * @throws ErrorException
-     */
     public function testEnumEnums()
     {
         $enums = Enum::enums();
@@ -189,9 +187,6 @@ class EnumTest extends TestCase
         $this->assertTrue(Enum::NULL_NULL()->equals($enums['NULL_NULL']));
     }
 
-    /**
-     * @throws ErrorException
-     */
     public function testEnumNames()
     {
         $names = Enum::names();
@@ -216,9 +211,6 @@ class EnumTest extends TestCase
         $this->assertContains('NULL_NULL', $names);
     }
 
-    /**
-     * @throws ErrorException
-     */
     public function testEnumValues()
     {
         $values = Enum::values();
@@ -243,61 +235,52 @@ class EnumTest extends TestCase
         $this->assertEquals(NULL, $values['NULL_NULL']);
     }
 
-    /**
-     * @throws ErrorException
-     */
     public function testEnumContainsName()
     {
-        $this->assertTrue(Enum::containsEnumName('BOOLEAN_TRUE'));
-        $this->assertTrue(Enum::containsEnumName('BOOLEAN_FALSE'));
-        $this->assertTrue(Enum::containsEnumName('INTEGER_ZERO'));
-        $this->assertTrue(Enum::containsEnumName('INTEGER_ONE'));
-        $this->assertTrue(Enum::containsEnumName('INTEGER_MINUS_TWO'));
-        $this->assertTrue(Enum::containsEnumName('INTEGER_THREE'));
-        $this->assertTrue(Enum::containsEnumName('FLOAT_ZERO'));
-        $this->assertTrue(Enum::containsEnumName('FLOAT_MINUS_POINT_ONE'));
-        $this->assertTrue(Enum::containsEnumName('FLOAT_POINT_ONE'));
-        $this->assertTrue(Enum::containsEnumName('FLOAT_ONE'));
-        $this->assertTrue(Enum::containsEnumName('STRING_EMPTY'));
-        $this->assertTrue(Enum::containsEnumName('STRING_INTEGER_ONE'));
-        $this->assertTrue(Enum::containsEnumName('STRING_ONE'));
-        $this->assertTrue(Enum::containsEnumName('STRING_EOF'));
-        $this->assertTrue(Enum::containsEnumName('ARRAY_EMPTY'));
-        $this->assertTrue(Enum::containsEnumName('ARRAY_ONE'));
-        $this->assertTrue(Enum::containsEnumName('ARRAY_FLOAT_TWO'));
-        $this->assertTrue(Enum::containsEnumName('ARRAY_STRING'));
-        $this->assertTrue(Enum::containsEnumName('NULL_NULL'));
+        $this->assertEquals(1, Enum::containsEnumName('BOOLEAN_TRUE'));
+        $this->assertEquals(1, Enum::containsEnumName('BOOLEAN_FALSE'));
+        $this->assertEquals(1, Enum::containsEnumName('INTEGER_ZERO'));
+        $this->assertEquals(1, Enum::containsEnumName('INTEGER_ONE'));
+        $this->assertEquals(1, Enum::containsEnumName('INTEGER_MINUS_TWO'));
+        $this->assertEquals(1, Enum::containsEnumName('INTEGER_THREE'));
+        $this->assertEquals(1, Enum::containsEnumName('FLOAT_ZERO'));
+        $this->assertEquals(1, Enum::containsEnumName('FLOAT_MINUS_POINT_ONE'));
+        $this->assertEquals(1, Enum::containsEnumName('FLOAT_POINT_ONE'));
+        $this->assertEquals(1, Enum::containsEnumName('FLOAT_ONE'));
+        $this->assertEquals(1, Enum::containsEnumName('STRING_EMPTY'));
+        $this->assertEquals(1, Enum::containsEnumName('STRING_INTEGER_ONE'));
+        $this->assertEquals(1, Enum::containsEnumName('STRING_ONE'));
+        $this->assertEquals(1, Enum::containsEnumName('STRING_EOF'));
+        $this->assertEquals(1, Enum::containsEnumName('ARRAY_EMPTY'));
+        $this->assertEquals(1, Enum::containsEnumName('ARRAY_ONE'));
+        $this->assertEquals(1, Enum::containsEnumName('ARRAY_FLOAT_TWO'));
+        $this->assertEquals(1, Enum::containsEnumName('ARRAY_STRING'));
+        $this->assertEquals(1, Enum::containsEnumName('NULL_NULL'));
     }
 
-    /**
-     * @throws ErrorException
-     */
     public function testEnumContainsValue()
     {
-        $this->assertTrue(Enum::containsEnumValue(TRUE));
-        $this->assertTrue(Enum::containsEnumValue(FALSE));
-        $this->assertTrue(Enum::containsEnumValue(0));
-        $this->assertTrue(Enum::containsEnumValue(1));
-        $this->assertTrue(Enum::containsEnumValue(-2));
-        $this->assertTrue(Enum::containsEnumValue(3));
-        $this->assertTrue(Enum::containsEnumValue(0.0));
-        $this->assertTrue(Enum::containsEnumValue(-1.0));
-        $this->assertTrue(Enum::containsEnumValue(0.1));
-        $this->assertTrue(Enum::containsEnumValue(0.555 + 0.512 - 0.067));
-        $this->assertTrue(Enum::containsEnumValue(''));
-        $this->assertTrue(Enum::containsEnumValue('1'));
-        $this->assertTrue(Enum::containsEnumValue('one'));
-        $this->assertTrue(Enum::containsEnumValue('    This is a very long text.'));
-        $this->assertTrue(Enum::containsEnumValue([]));
-        $this->assertTrue(Enum::containsEnumValue([1]));
-        $this->assertTrue(Enum::containsEnumValue([0.3-0.1=>0.2]));
-        $this->assertTrue(Enum::containsEnumValue(['This' => ['is' => 'a', ['array']]]));
-        $this->assertTrue(Enum::containsEnumValue(NULL));
+        $this->assertEquals(1, Enum::containsEnumValue(TRUE));
+        $this->assertEquals(1, Enum::containsEnumValue(FALSE));
+        $this->assertEquals(1, Enum::containsEnumValue(0));
+        $this->assertEquals(1, Enum::containsEnumValue(1));
+        $this->assertEquals(1, Enum::containsEnumValue(-2));
+        $this->assertEquals(1, Enum::containsEnumValue(3));
+        $this->assertEquals(1, Enum::containsEnumValue(0.0));
+        $this->assertEquals(1, Enum::containsEnumValue(-1.0));
+        $this->assertEquals(1, Enum::containsEnumValue(0.1));
+        $this->assertEquals(1, Enum::containsEnumValue(0.555 + 0.512 - 0.067));
+        $this->assertEquals(1, Enum::containsEnumValue(''));
+        $this->assertEquals(1, Enum::containsEnumValue('1'));
+        $this->assertEquals(1, Enum::containsEnumValue('one'));
+        $this->assertEquals(1, Enum::containsEnumValue('    This is a very long text.'));
+        $this->assertEquals(1, Enum::containsEnumValue([]));
+        $this->assertEquals(1, Enum::containsEnumValue([1]));
+        $this->assertEquals(1, Enum::containsEnumValue([0.3-0.1=>0.2]));
+        $this->assertEquals(1, Enum::containsEnumValue(['This' => ['is' => 'a', ['array']]]));
+        $this->assertEquals(1, Enum::containsEnumValue(NULL));
     }
 
-    /**
-     * @throws ErrorException
-     */
     public function testEnumOfName()
     {
         $this->assertTrue(Enum::ofEnumName('BOOLEAN_TRUE')->equals(Enum::BOOLEAN_TRUE()));
@@ -323,7 +306,7 @@ class EnumTest extends TestCase
     }
 
     /**
-     * @throws ErrorException
+     * @throws EnumConflictException
      */
     public function testEnumOfValue()
     {
@@ -348,9 +331,6 @@ class EnumTest extends TestCase
         $this->assertTrue(Enum::ofEnumValue(NULL)->equals(Enum::NULL_NULL()));
     }
 
-    /**
-     * @throws ErrorException
-     */
     public function testEnumCount()
     {
         $this->assertCount(Enum::count(), Enum::names());

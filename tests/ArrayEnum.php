@@ -23,7 +23,6 @@ namespace PhpEnum\Tests;
  */
 class ArrayEnum extends \PhpEnum\ArrayEnum
 {
-
     const BOOLEAN_TRUE = [TRUE, 'true'];
     const BOOLEAN_FALSE = [FALSE, 'false'];
 
@@ -42,4 +41,8 @@ class ArrayEnum extends \PhpEnum\ArrayEnum
 
     const NULL_NULL = [NULL, 'null'];
 
+    protected function scale()
+    {
+        return 5;
+    }
 }

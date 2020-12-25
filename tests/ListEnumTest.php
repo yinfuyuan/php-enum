@@ -2,7 +2,7 @@
 
 namespace PhpEnum\Tests;
 
-use ErrorException;
+use PhpEnum\Exceptions\PropertyNotFoundException;
 use PHPUnit\Framework\TestCase;
 
 class ListEnumTest extends TestCase
@@ -44,19 +44,18 @@ class ListEnumTest extends TestCase
 
     public function testEnumContains()
     {
-        $this->assertTrue(ListEnum::containsInteger(0));
-        $this->assertTrue(ListEnum::containsFloat(0.0));
-        $this->assertTrue(ListEnum::containsString(''));
-        $this->assertTrue(ListEnum::containsArray([]));
-        $this->assertTrue(ListEnum::containsBoolean(false));
-        $this->assertTrue(ListEnum::containsNull(null));
+        $this->assertEquals(1, ListEnum::containsInteger(0));
+        $this->assertEquals(1, ListEnum::containsFloat(0.0));
+        $this->assertEquals(1, ListEnum::containsString(''));
+        $this->assertEquals(1, ListEnum::containsArray([]));
+        $this->assertEquals(1, ListEnum::containsBoolean(false));
+        $this->assertEquals(2, ListEnum::containsNull(null));
 
-        $this->assertTrue(ListEnum::containsInteger(4+6-8));
-        $this->assertTrue(ListEnum::containsFloat(2.45+4.234-6.4177));
-        $this->assertTrue(ListEnum::containsString('This is a very long text.'));
-        $this->assertTrue(ListEnum::containsArray(['This' => ['is' => 'a', ['array']]]));
-        $this->assertTrue(ListEnum::containsBoolean(true));
-        $this->assertTrue(ListEnum::containsNull(null));
+        $this->assertEquals(1, ListEnum::containsInteger(4+6-8));
+        $this->assertEquals(1, ListEnum::containsFloat(2.45+4.234-6.4177));
+        $this->assertEquals(1, ListEnum::containsString('This is a very long text.'));
+        $this->assertEquals(1, ListEnum::containsArray(['This' => ['is' => 'a', ['array']]]));
+        $this->assertEquals(1, ListEnum::containsBoolean(true));
     }
 
     public function testEnumOf()
@@ -77,7 +76,7 @@ class ListEnumTest extends TestCase
     }
 
     /**
-     * @throws ErrorException
+     * @throws PropertyNotFoundException
      */
     public function testEnumArray()
     {

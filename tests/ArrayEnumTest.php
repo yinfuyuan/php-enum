@@ -2,12 +2,11 @@
 
 namespace PhpEnum\Tests;
 
-use ErrorException;
+use PhpEnum\Exceptions\PropertyNotFoundException;
 use PHPUnit\Framework\TestCase;
 
 class ArrayEnumTest extends TestCase
 {
-
     public function testEnumName()
     {
         $this->assertEquals('BOOLEAN_TRUE', ArrayEnum::BOOLEAN_TRUE()->name());
@@ -104,9 +103,6 @@ class ArrayEnumTest extends TestCase
         $this->assertTrue(ArrayEnum::NULL_NULL()->valueEquals('null'));
     }
 
-    /**
-     * @throws ErrorException
-     */
     public function testEnumNames()
     {
         $names = ArrayEnum::names();
@@ -131,7 +127,7 @@ class ArrayEnumTest extends TestCase
     }
 
     /**
-     * @throws ErrorException
+     * @throws PropertyNotFoundException
      */
     public function testEnumKeys()
     {
@@ -144,7 +140,7 @@ class ArrayEnumTest extends TestCase
     }
 
     /**
-     * @throws ErrorException
+     * @throws PropertyNotFoundException
      */
     public function testEnumValues()
     {
@@ -156,9 +152,6 @@ class ArrayEnumTest extends TestCase
         $this->assertCount(1, ArrayEnum::getProperties('value', 'NULL'));
     }
 
-    /**
-     * @throws ErrorException
-     */
     public function testEnumEnums()
     {
         $this->assertCount(2, ArrayEnum::enums('BOOLEAN'));
@@ -169,61 +162,55 @@ class ArrayEnumTest extends TestCase
         $this->assertCount(1, ArrayEnum::enums('NULL'));
     }
 
-    /**
-     * @throws ErrorException
-     */
-    public function testEnumHasName()
+    public function testEnumContainsName()
     {
-        $this->assertTrue(ArrayEnum::containsEnumName('BOOLEAN_TRUE'));
-        $this->assertTrue(ArrayEnum::containsEnumName('BOOLEAN_FALSE'));
-        $this->assertTrue(ArrayEnum::containsEnumName('INTEGER_ZERO'));
-        $this->assertTrue(ArrayEnum::containsEnumName('INTEGER_ONE'));
-        $this->assertTrue(ArrayEnum::containsEnumName('INTEGER_TWO'));
-        $this->assertTrue(ArrayEnum::containsEnumName('FLOAT_ZERO'));
-        $this->assertTrue(ArrayEnum::containsEnumName('FLOAT_ONE'));
-        $this->assertTrue(ArrayEnum::containsEnumName('STRING_EMPTY'));
-        $this->assertTrue(ArrayEnum::containsEnumName('STRING_ONE'));
-        $this->assertTrue(ArrayEnum::containsEnumName('ARRAY_EMPTY'));
-        $this->assertTrue(ArrayEnum::containsEnumName('ARRAY_ONE'));
-        $this->assertTrue(ArrayEnum::containsEnumName('NULL_NULL'));
+        $this->assertEquals(1, ArrayEnum::containsEnumName('BOOLEAN_TRUE'));
+        $this->assertEquals(1, ArrayEnum::containsEnumName('BOOLEAN_FALSE'));
+        $this->assertEquals(1, ArrayEnum::containsEnumName('INTEGER_ZERO'));
+        $this->assertEquals(1, ArrayEnum::containsEnumName('INTEGER_ONE'));
+        $this->assertEquals(1, ArrayEnum::containsEnumName('INTEGER_TWO'));
+        $this->assertEquals(1, ArrayEnum::containsEnumName('FLOAT_ZERO'));
+        $this->assertEquals(1, ArrayEnum::containsEnumName('FLOAT_ONE'));
+        $this->assertEquals(1, ArrayEnum::containsEnumName('STRING_EMPTY'));
+        $this->assertEquals(1, ArrayEnum::containsEnumName('STRING_ONE'));
+        $this->assertEquals(1, ArrayEnum::containsEnumName('ARRAY_EMPTY'));
+        $this->assertEquals(1, ArrayEnum::containsEnumName('ARRAY_ONE'));
+        $this->assertEquals(1, ArrayEnum::containsEnumName('NULL_NULL'));
     }
 
-    public function testEnumHasKey()
+    public function testEnumContainsKey()
     {
-        $this->assertTrue(ArrayEnum::containsKey(TRUE));
-        $this->assertTrue(ArrayEnum::containsKey(FALSE));
-        $this->assertTrue(ArrayEnum::containsKey(0));
-        $this->assertTrue(ArrayEnum::containsKey(1));
-        $this->assertTrue(ArrayEnum::containsKey(-2));
-        $this->assertTrue(ArrayEnum::containsKey(0.0));
-        $this->assertTrue(ArrayEnum::containsKey(1.0));
-        $this->assertTrue(ArrayEnum::containsKey(''));
-        $this->assertTrue(ArrayEnum::containsKey('1'));
-        $this->assertTrue(ArrayEnum::containsKey([]));
-        $this->assertTrue(ArrayEnum::containsKey([1]));
-        $this->assertTrue(ArrayEnum::containsKey(NULL));
+        $this->assertEquals(1, ArrayEnum::containsKey(TRUE));
+        $this->assertEquals(1, ArrayEnum::containsKey(FALSE));
+        $this->assertEquals(1, ArrayEnum::containsKey(0));
+        $this->assertEquals(1, ArrayEnum::containsKey(1));
+        $this->assertEquals(1, ArrayEnum::containsKey(-2));
+        $this->assertEquals(1, ArrayEnum::containsKey(0.0));
+        $this->assertEquals(1, ArrayEnum::containsKey(1.0));
+        $this->assertEquals(1, ArrayEnum::containsKey(''));
+        $this->assertEquals(1, ArrayEnum::containsKey('1'));
+        $this->assertEquals(1, ArrayEnum::containsKey([]));
+        $this->assertEquals(1, ArrayEnum::containsKey([1]));
+        $this->assertEquals(1, ArrayEnum::containsKey(NULL));
     }
 
-    public function testEnumHasValue()
+    public function testEnumContainsValue()
     {
-        $this->assertTrue(ArrayEnum::containsValue('true'));
-        $this->assertTrue(ArrayEnum::containsValue('false'));
-        $this->assertTrue(ArrayEnum::containsValue('zero', 'INTEGER'));
-        $this->assertTrue(ArrayEnum::containsValue('one', 'INTEGER'));
-        $this->assertTrue(ArrayEnum::containsValue('two', 'INTEGER'));
-        $this->assertTrue(ArrayEnum::containsValue('zero', 'FLOAT'));
-        $this->assertTrue(ArrayEnum::containsValue('one', 'FLOAT'));
-        $this->assertTrue(ArrayEnum::containsValue('empty', 'STRING'));
-        $this->assertTrue(ArrayEnum::containsValue('one', 'STRING'));
-        $this->assertTrue(ArrayEnum::containsValue('empty', 'ARRAY'));
-        $this->assertTrue(ArrayEnum::containsValue('one', 'ARRAY'));
-        $this->assertTrue(ArrayEnum::containsValue('null'));
+        $this->assertEquals(1, ArrayEnum::containsValue('true'));
+        $this->assertEquals(1, ArrayEnum::containsValue('false'));
+        $this->assertEquals(1, ArrayEnum::containsValue('zero', 'INTEGER'));
+        $this->assertEquals(1, ArrayEnum::containsValue('one', 'INTEGER'));
+        $this->assertEquals(1, ArrayEnum::containsValue('two', 'INTEGER'));
+        $this->assertEquals(1, ArrayEnum::containsValue('zero', 'FLOAT'));
+        $this->assertEquals(1, ArrayEnum::containsValue('one', 'FLOAT'));
+        $this->assertEquals(1, ArrayEnum::containsValue('empty', 'STRING'));
+        $this->assertEquals(1, ArrayEnum::containsValue('one', 'STRING'));
+        $this->assertEquals(1, ArrayEnum::containsValue('empty', 'ARRAY'));
+        $this->assertEquals(1, ArrayEnum::containsValue('one', 'ARRAY'));
+        $this->assertEquals(1, ArrayEnum::containsValue('null'));
     }
 
-    /**
-     * @throws ErrorException
-     */
-    public function testEnumByName()
+    public function testEnumOfName()
     {
         $this->assertTrue(ArrayEnum::ofEnumName('BOOLEAN_TRUE')->equals(ArrayEnum::BOOLEAN_TRUE()));
         $this->assertTrue(ArrayEnum::ofEnumName('BOOLEAN_FALSE')->equals(ArrayEnum::BOOLEAN_FALSE()));
@@ -239,7 +226,7 @@ class ArrayEnumTest extends TestCase
         $this->assertTrue(ArrayEnum::ofEnumName('NULL_NULL')->equals(ArrayEnum::NULL_NULL()));
     }
 
-    public function testEnumByKey()
+    public function testEnumOfKey()
     {
         $this->assertTrue(ArrayEnum::ofKey(TRUE)->equals(ArrayEnum::BOOLEAN_TRUE()));
         $this->assertTrue(ArrayEnum::ofKey(FALSE)->equals(ArrayEnum::BOOLEAN_FALSE()));
@@ -255,7 +242,7 @@ class ArrayEnumTest extends TestCase
         $this->assertTrue(ArrayEnum::ofKey(NULL)->equals(ArrayEnum::NULL_NULL()));
     }
 
-    public function testEnumByValue()
+    public function testEnumOfValue()
     {
         $this->assertTrue(ArrayEnum::ofValue('true')->equals(ArrayEnum::BOOLEAN_TRUE()));
         $this->assertTrue(ArrayEnum::ofValue('false')->equals(ArrayEnum::BOOLEAN_FALSE()));
