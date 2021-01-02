@@ -35,7 +35,7 @@ use Exception;
  * @license  https://opensource.org/licenses/GPL-3.0 GPL-3.0
  * @link     https://github.com/yinfuyuan/php-enum
  */
-class InvalidConstructException extends Exception
+class InstantiationException extends Exception
 {
 
 }

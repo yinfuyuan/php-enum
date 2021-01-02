@@ -15,7 +15,7 @@
  *
  * PHP version 5.6
  *
- * @category ListEnum
+ * @category PhpEnum
  * @package  PhpEnum
  * @author   yinfuyuan <yinfuyuan@gmail.com>
  * @license  https://opensource.org/licenses/GPL-3.0 GPL-3.0
@@ -24,63 +24,35 @@
 
 namespace PhpEnum;
 
-use InvalidArgumentException;
 use PhpEnum\Exceptions\EnumConflictException;
-use PhpEnum\Exceptions\InvalidConstructException;
+use PhpEnum\Exceptions\IllegalArgumentException;
+use PhpEnum\Exceptions\InstantiationException;
 use PhpEnum\Exceptions\MethodNotFoundException;
 use PhpEnum\Exceptions\PropertyNotFoundException;
-use ReflectionClass;
 
 /**
- * This is the common base class of multivalued enumeration types.
+ * This is the complex attribute enumeration types.
  *
- * Note that when using an single valued enumeration type {@see Enum} are available,
- * and when using an two value enumeration type {@see ArrayEnum} are available.
+ * Note that when using simple enumeration, specialized and efficient {@see Enum} implementations are available.
  *
- * @category ListEnum
+ * @category PhpEnum
  * @package  PhpEnum
  * @author   yinfuyuan <yinfuyuan@gmail.com>
  * @license  https://opensource.org/licenses/GPL-3.0 GPL-3.0
  * @link     https://github.com/yinfuyuan/php-enum
  * @see      Enum
- * @see      ArrayEnum
  */
-abstract class ListEnum extends Enum
+abstract class PhpEnum extends Enum
 {
     /**
-     * List enum construct method name.
-     *
-     * Programmers must implement this method in subclass. This method cannot be defined as an abstract method
-     * or interface because the number of arguments is uncertain.
-     *
-     * @see ArrayEnum::listEnumConstruct()
-     * @var string
-     */
-    private $construct = 'listEnumConstruct'; // phpcs:ignore
-
-    /**
-     * The enum's shared params.
-     *
-     * @var array
-     */
-    private static $params = []; // phpcs:ignore
-
-    /**
-     * The enum's shared properties.
-     *
-     * @var array
-     */
-    private static $properties = []; // phpcs:ignore
-
-    /**
-     * ListEnum expand function. Programmers cannot invoke this constructor.
+     * PhpEnum shortcut. Programmers cannot invoke this shortcut.
      *
      * @param string $name      the name of this enum constant.
      * @param mixed  $arguments dynamic parameters, which have no practical use here.
      *
      * @return mixed
-     * @see    ListEnum::propertyEquals()
-     * @see    ListEnum::getProperty()
+     * @see    PhpEnum::propertyEquals()
+     * @see    PhpEnum::get()
      * @throws PropertyNotFoundException if the property doesn't exist
      * @throws MethodNotFoundException if the property doesn't exist
      */
@@ -91,45 +63,25 @@ abstract class ListEnum extends Enum
         }
 
         if (strlen($name) > 3 && strpos($name, 'get') === 0) {
-            return $this->getProperty(substr($name, 3));
+            return $this->get(substr($name, 3));
         }
 
         throw new MethodNotFoundException('Method ' . static::class . '::' . $name . '() not found');
     }
 
     /**
-     * ListEnum constructor. Programmers cannot invoke this constructor, and should get the instance by magic function.
-     *
-     * @return void
-     * @throws InvalidArgumentException if list enum constant type is not an correct array
-     * @throws InvalidConstructException if List enum are missing construct method or parameter mismatches
-     */
-    protected final function enumConstruct()
-    {
-        if (!is_array($this->value()) || count($this->value()) === 0) {
-            throw new InvalidArgumentException('List enum constant only accepts an not empty array');
-        }
-        
-        if ($this->getEnumParams() !== count($this->value())) {
-            throw new InvalidConstructException(
-                'List enum are missing protected function ' . $this->construct . ' or parameter mismatches'
-            );
-        }
-
-        call_user_func_array([$this, $this->construct], $this->value());
-    }
-
-    /**
-     * ListEnum expand function. Programmers cannot invoke this constructor.
+     * PhpEnum shortcut. Programmers cannot invoke this shortcut.
      *
      * @param string $name      the name of the method being called.
      * @param array  $arguments an array containing the parameters passed to the $name'ed method.
-     * 
+     *
      * @return mixed
-     * @see    ListEnum::containsProperty()
-     * @see    ListEnum::ofProperty()
      * @throws PropertyNotFoundException if the property doesn't exist
      * @throws EnumConflictException if there are multiple enumerations of the same value
+     * @throws IllegalArgumentException if the constant value is not an array
+     * @throws InstantiationException if the enum type missing protected constructor or arguments mismatches
+     * @see    PhpEnum::containsProperty()
+     * @see    PhpEnum::ofProperty()
      */
     protected static final function callStatic($name, $arguments)
     {
@@ -152,19 +104,36 @@ abstract class ListEnum extends Enum
      *
      * @param string $property the property name of this enum.
      *
-     * @return mixed the property value if the specified property is exists
-     * @throws PropertyNotFoundException if the property doesn't exist
+     * @return mixed the property value if the specified property or property getter is exists
+     * @throws PropertyNotFoundException if the property or property getter doesn't exist
      */
-    public final function getProperty($property)
+    public final function get($property)
     {
-        $properties = $this->getEnumProperties();
         $property = lcfirst($property);
 
+        $properties = get_object_vars($this);
         if (array_key_exists($property, $properties)) {
-            return $properties[$property];
+            return $this->{$property};
+        }
+
+        $getter = 'get' . ucfirst($property);
+        if (in_array($getter, get_class_methods($this))) {
+            return $this->{$getter}();
         }
 
         throw new PropertyNotFoundException('Property ' . static::class . '->' . $property . ' not found');
+    }
+
+    /**
+     * Returns true if the specified name is equal to this enum name.
+     *
+     * @param string $name the name to be compared for equality with this enum name.
+     *
+     * @return bool true if the specified name is equal to this enum name
+     */
+    public final function enumNameEquals($name)
+    {
+        return $this->name() === $name;
     }
 
     /**
@@ -179,34 +148,54 @@ abstract class ListEnum extends Enum
      */
     public final function propertyEquals($property, $value, $strict = true)
     {
-        $mixed = $this->getProperty($property);
+        $mixed = $this->get($property);
         if (!is_float($mixed)) {
             return $strict ? $mixed === $value : $mixed == $value;
         }
         if ($strict && !is_float($value)) {
             return false;
         }
-        if ($this->scale() === 0 || !extension_loaded('bcmath')) {
+        $scale = intval($this->scale());
+        if ($scale > 0 || !extension_loaded('bcmath')) {
             return strval($mixed) === strval($value);
         }
-        return bccomp(strval($mixed), strval($value), $this->scale()) === 0;
+        return bccomp(strval($mixed), strval($value), $scale) === 0;
     }
 
     /**
-     * Returns true if the specified value is exists with this property.
+     * Returns false if the specified name does not exists.
+     *
+     * @param string $name   the name used to check if it exists.
+     * @param string $prefix returns the part of that name is start with the specified prefix.
+     *
+     * @return bool true if the specified name is exists
+     * @throws IllegalArgumentException if the constant value is not an array
+     * @throws InstantiationException if the enum type missing protected constructor or arguments mismatches
+     */
+    public static final function containsEnumName($name, $prefix = '')
+    {
+        $values = self::values($prefix);
+
+        return array_key_exists($name, $values);
+    }
+
+    /**
+     * Returns 0 if the specified value does not exists with this property.
      *
      * @param string $property the property name of this enum.
      * @param mixed  $value    the value used to check if it exists with this property.
      * @param string $prefix   returns the part of that enum name is start with the specified prefix.
      *
-     * @return int true if the specified value is exists with this property
+     * @return int the count of the property value if the specified property value is exists
      * @throws PropertyNotFoundException if the property doesn't exist
+     * @throws IllegalArgumentException if the constant value is not an array
+     * @throws InstantiationException if the enum type missing protected constructor or arguments mismatches
      */
     public static final function containsProperty($property, $value, $prefix = '')
     {
         $result = 0;
 
-        $enums = self::enums($prefix);
+        $enums = self::values($prefix);
 
         foreach ($enums as $enum) {
             if ($enum->propertyEquals($property, $value)) {
@@ -224,15 +213,17 @@ abstract class ListEnum extends Enum
      * @param mixed  $value    the value used to get the enum.
      * @param string $prefix   returns the part of that enum name is start with the specified prefix.
      *
-     * @return ListEnum|null the enum if the the property with the specified value is exists
+     * @return static|null the enum if the the property with the specified value is exists
      * @throws PropertyNotFoundException if the property doesn't exist
      * @throws EnumConflictException if there are multiple enumerations of the same value
+     * @throws IllegalArgumentException if the constant value is not an array
+     * @throws InstantiationException if the enum type missing protected constructor or arguments mismatches
      */
     public static final function ofProperty($property, $value, $prefix = '')
     {
         $result = null;
 
-        $enums = self::enums($prefix);
+        $enums = self::values($prefix);
 
         foreach ($enums as $enum) {
             if (!$enum->propertyEquals($property, $value)) {
@@ -253,76 +244,68 @@ abstract class ListEnum extends Enum
      * @param string $property the property name of this enum.
      * @param string $prefix   returns the part of that enum name is start with the specified prefix.
      *
-     * @return array the values of all the property of enum and uses the enum name as the key
+     * @return array the values of all the property of enum
      * @throws PropertyNotFoundException if the property doesn't exist
+     * @throws IllegalArgumentException if the constant value is not an array
+     * @throws InstantiationException if the enum type missing protected constructor or arguments mismatches
      */
-    public static final function getProperties($property = '', $prefix = '')
+    public static final function properties($property, $prefix = '')
     {
         $properties = [];
 
-        $enums = self::enums($prefix);
+        $values = self::values($prefix);
 
-        foreach ($enums as $enum) {
-            $properties[$enum->name()] = empty($property) ? $enum->getEnumProperties() : $enum->getProperty($property);
+        foreach ($values as $enum) {
+            $properties[$enum->name()] = $enum->get($property);
         }
 
         return $properties;
     }
 
     /**
-     * Returns the number of list enum construct required parameters.
-     * 
-     * @return int the number of list enum construct required parameters
+     * Returns all the enum names.
+     *
+     * @param string $prefix returns the part of that name is start with the specified prefix.
+     *
+     * @return string[] all the enum names
+     * @throws IllegalArgumentException if the constant value is not an array
+     * @throws InstantiationException if the enum type missing protected constructor or arguments mismatches
      */
-    protected final function getEnumParams()
+    public static final function names($prefix = '')
     {
-        $class = static::class;
+        $values = self::values($prefix);
 
-        if (array_key_exists($class, self::$params)) {
-            return self::$params[$class];
-        }
-
-        $reflection = new ReflectionClass(static::class);
-
-        if (!$reflection->hasMethod($this->construct)) {
-            return self::$params[$class] = 0;
-        }
-
-        $method = $reflection->getMethod($this->construct);
-
-        if (!$method->isProtected() || $method->getNumberOfParameters() != $method->getNumberOfRequiredParameters()) {
-            return self::$params[$class] = 0;
-        }
-
-        return self::$params[$class] = $reflection->getMethod($this->construct)->getNumberOfParameters();
+        return array_keys($values);
     }
 
     /**
-     * Returns the array of properties.
+     * Returns scale is used to set the number of digits after the decimal place which will be used in the comparison.
      *
-     * @return array the array of properties
+     * Due to the special nature of PHP, it is not accurate to directly compare two floating-point types,
+     * so when bcmath extension is enabled and scale is set, the bccomp function is preferred for comparison.
+     *
+     * @link   https://www.php.net/manual/en/language.types.float.php
+     * @see    bcmath()
+     * @return int
      */
-    protected final function getEnumProperties()
+    protected function scale()
     {
-        $class = static::class;
+        return 0;
+    }
 
-        if (!empty(self::$properties[$class][$this->name()])) {
-            return self::$properties[$class][$this->name()];
-        }
+    /**
+     * Returns enums count.
+     *
+     * @param string $prefix returns the part of that name is start with the specified prefix.
+     *
+     * @return int enums count
+     * @throws IllegalArgumentException if the constant value is not an array
+     * @throws InstantiationException if the enum type missing protected constructor or arguments mismatches
+     */
+    public static final function count($prefix = '')
+    {
+        $values = self::values($prefix);
 
-        self::$properties[$class][$this->name()] = [];
-
-        $reflection = new ReflectionClass(static::class);
-
-        $properties = $reflection->getProperties();
-
-        foreach ($properties as $property) {
-            if (!$property->isStatic()) {
-                $property->setAccessible(true);
-                self::$properties[$class][$this->name()][$property->getName()] = $property->getValue($this);
-            }
-        }
-
-        return self::$properties[$class][$this->name()];
+        return count($values);
     }
 }

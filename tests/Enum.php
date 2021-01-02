@@ -30,35 +30,44 @@ namespace PhpEnum\Tests;
  */
 class Enum extends \PhpEnum\Enum
 {
-    const BOOLEAN_TRUE = TRUE;
-    const BOOLEAN_FALSE = FALSE;
 
-    const INTEGER_ZERO = 0;
-    const INTEGER_ONE = 1;
-    const INTEGER_MINUS_TWO = -2;
-    const INTEGER_THREE = 3;
+    const BOOLEAN_TRUE = [TRUE];
+    const BOOLEAN_FALSE = [FALSE];
 
-    const FLOAT_ZERO = 0.0;
-    const FLOAT_MINUS_POINT_ONE = -1.0;
-    const FLOAT_POINT_ONE = 0.1;
-    const FLOAT_ONE = 0.555 + 0.512 - 0.067;
+    const INTEGER_ZERO = [0];
+    const INTEGER_ONE = [1];
+    const INTEGER_MINUS_TWO = [-2];
+    const INTEGER_THREE = [3];
 
-    const STRING_EMPTY = '';
-    const STRING_INTEGER_ONE = '1';
-    const STRING_ONE = 'one';
-    const STRING_EOF = <<<EOT
+    const FLOAT_ZERO = [0.0];
+    const FLOAT_MINUS_POINT_ONE = [-1.0];
+    const FLOAT_POINT_ONE = [0.1];
+    const FLOAT_ONE = [0.555 + 0.512 - 0.067];
+
+    const STRING_EMPTY = [''];
+    const STRING_INTEGER_ONE = ['1'];
+    const STRING_ONE = ['one'];
+    const STRING_EOF = [<<<EOT
     This is a very long text.
-EOT;
+EOT
+    ];
 
-    const ARRAY_EMPTY = [];
-    const ARRAY_ONE = [1];
-    const ARRAY_FLOAT_TWO = [0.3-0.1=>0.2];
-    const ARRAY_STRING = ['This' => ['is' => 'a', ['array']]];
+    const ARRAY_EMPTY = [[]];
+    const ARRAY_ONE = [[1]];
+    const ARRAY_FLOAT_TWO = [[0.3-0.1=>0.2]];
+    const ARRAY_STRING = [['This' => ['is' => 'a', ['array']]]];
 
-    const NULL_NULL = NULL;
+    const NULL_NULL = [NULL];
 
-    protected function scale()
+    private $value;
+
+    protected function construct($value)
     {
-        return 5;
+        $this->value = $value;
+    }
+
+    public function getValue()
+    {
+        return $this->value;
     }
 }

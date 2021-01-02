@@ -34,19 +34,19 @@ namespace PhpEnum\Tests;
  * @method static self|null ofBoolean($value)
  * @method static self|null ofNull($value, $prefix = '')
  */
-class ListEnum extends \PhpEnum\ListEnum
+class PhpEnum extends \PhpEnum\PhpEnum
 {
     const ZERO = [0, 0.0, '', [], FALSE, NULL];
     const ONE = [4+6-8, 2.45+4.234-6.4177, 'This is a very long text.', ['This' => ['is' => 'a', ['array']]], TRUE, NULL];
 
-    private $integer;
-    private $float;
-    private $string;
-    private $array;
-    private $boolean;
-    private $null;
+    protected $integer;
+    protected $float;
+    protected $string;
+    protected $array;
+    protected $boolean;
+    protected $null;
 
-    protected function listEnumConstruct($integer, $float, $string, $array, $boolean, $null)
+    protected function construct($integer, $float, $string, $array, $boolean, $null)
     {
         $this->integer = $integer;
         $this->float = $float;
