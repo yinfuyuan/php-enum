@@ -156,7 +156,7 @@ abstract class PhpEnum extends Enum
             return false;
         }
         $scale = intval($this->scale());
-        if ($scale > 0 || !extension_loaded('bcmath')) {
+        if ($scale <= 0 || !extension_loaded('bcmath')) {
             return strval($mixed) === strval($value);
         }
         return bccomp(strval($mixed), strval($value), $scale) === 0;
