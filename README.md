@@ -1,7 +1,7 @@
 # PHP Enum
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/phpenum/phpenum.svg?style=for-the-badge)](https://packagist.org/packages/phpenum/phpenum)
-[![License](https://img.shields.io/github/license/yinfuyuan/php-enum?style=for-the-badge)](https://github.com/yinfuyuan/php-enum/blob/master/LICENSE.md)
+[![License](https://img.shields.io/github/license/yinfuyuan/php-enum?style=for-the-badge)](https://github.com/yinfuyuan/php-enum/blob/master/LICENSE)
 ![Postcardware](https://img.shields.io/badge/Postcardware-%F0%9F%92%8C-197593?style=for-the-badge)
 
 [![PHP from Packagist](https://img.shields.io/packagist/php-v/phpenum/phpenum?style=flat-square)](https://packagist.org/packages/phpenum/phpenum)
